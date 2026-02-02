@@ -36,7 +36,7 @@ See [docs/LINUX-INSTALLATION.md](docs/LINUX-INSTALLATION.md) for full details on
 ### Docker
 
 ```bash
-docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender diagram.excalidraw
+docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender diagram.excalidraw
 ```
 
 This converts `diagram.excalidraw` to `diagram.png` in the current directory.
@@ -66,19 +66,19 @@ excalirender <input> [options]
 
 ```bash
 # Basic conversion
-docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw
+docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw
 
 # Custom output path
-docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw -o output.png
+docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw -o output.png
 
 # 2x resolution
-docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw -s 2
+docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw -s 2
 
 # Dark mode
-docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw --dark
+docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw --dark
 
 # Custom background color
-docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw -b "#f0f0f0"
+docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw -b "#f0f0f0"
 ```
 
 ## Supported Elements

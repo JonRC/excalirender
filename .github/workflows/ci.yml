@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 env:
-  DOCKER_IMAGE: jonarc/excalirender
+  DOCKER_IMAGE: jonarc06/excalirender
 
 jobs:
   typecheck:
