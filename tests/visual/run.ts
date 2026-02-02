@@ -112,7 +112,7 @@ function discoverTests(): TestCase[] {
 
 async function buildDockerImage(): Promise<boolean> {
   console.log("Building Docker image...");
-  const proc = Bun.spawn(["docker", "compose", "build", "cli"], {
+  const proc = Bun.spawn(["docker", "build", "-t", "excalirender:test", "."], {
     cwd: PROJECT_ROOT,
     stdout: "pipe",
     stderr: "pipe",
@@ -138,10 +138,13 @@ async function runCli(
 
   const args = [
     "docker",
-    "compose",
     "run",
     "--rm",
-    "cli",
+    "-v",
+    `${PROJECT_ROOT}:/data`,
+    "-w",
+    "/data",
+    "excalirender:test",
     relInput,
     "-o",
     relOutput,
