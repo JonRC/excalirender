@@ -82,17 +82,16 @@ RUN mkdir -p /staging/lib && \
     done
 
 # Create minimal fontconfig configuration
+# NOTE: printf is used instead of a heredoc to avoid BuildKit misinterpreting
+# the <?xml declaration as a Dockerfile instruction.
 RUN mkdir -p /staging/etc/fonts && \
-    cat > /staging/etc/fonts/fonts.conf << 'FONTCONFIG_EOF'
-<?xml version="1.0"?>
-<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-<fontconfig>
-  <!-- Minimal fontconfig for excalirender native bundle.
-       Fonts are registered programmatically via registerFont();
-       this config just prevents fontconfig initialization errors. -->
-  <cachedir>/tmp/excalirender-fontcache</cachedir>
-</fontconfig>
-FONTCONFIG_EOF
+    printf '%s\n' \
+      '<?xml version="1.0"?>' \
+      '<!DOCTYPE fontconfig SYSTEM "fonts.dtd">' \
+      '<fontconfig>' \
+      '  <cachedir>/tmp/excalirender-fontcache</cachedir>' \
+      '</fontconfig>' \
+      > /staging/etc/fonts/fonts.conf
 
 # Create launcher shell script
 RUN printf '#!/bin/sh\n\
