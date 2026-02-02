@@ -37,8 +37,8 @@ const DIFFS_DIR = join(TESTS_DIR, "diffs");
 const PIXEL_THRESHOLD = 0.1;
 // Maximum percentage of different pixels allowed (text anti-aliasing can vary between runs)
 const MAX_DIFF_PERCENT = 1.0;
-// SVG rendered via resvg may differ more from PNG baselines due to different rendering engines
-const MAX_SVG_DIFF_PERCENT = 1.0;
+// SVG rendered via resvg may differ more due to platform-specific font rasterization in resvg-js
+const MAX_SVG_DIFF_PERCENT = 5.0;
 
 type TestFormat = "png" | "svg";
 
