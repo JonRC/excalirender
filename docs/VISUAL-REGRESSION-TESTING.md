@@ -4,7 +4,7 @@ Pixel-level comparison of PNG and SVG outputs against known-good baselines. Uses
 
 ## Prerequisites
 
-- Docker and Docker Compose
+- Docker
 - Bun
 
 ## Directory Structure
@@ -35,8 +35,8 @@ bun run tests/visual/run.ts --svg-only
 ```
 
 The runner:
-1. Builds the Docker image (`docker compose build cli`)
-2. Converts each fixture to PNG and SVG via `docker compose run --rm cli`
+1. Builds the Docker image
+2. Converts each fixture to PNG and SVG via Docker
 3. For PNG tests: compares output PNG against baseline using pixelmatch
 4. For SVG tests: renders SVG to PNG via resvg-js, then compares against SVG baseline using pixelmatch
 5. Reports pass/fail with diff percentage

@@ -41,12 +41,6 @@ docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender diagram.excalid
 
 This converts `diagram.excalidraw` to `diagram.png` in the current directory.
 
-### Docker Compose
-
-```bash
-docker compose run --rm cli diagram.excalidraw
-```
-
 ## Usage
 
 ```
@@ -132,7 +126,6 @@ See [docs/BUILD.md](docs/BUILD.md) for details on the Docker build, native bundl
 ```bash
 bun run start -- <file.excalidraw>   # Run from source
 bun run typecheck                     # TypeScript check
-docker compose run --rm cli <file>    # Run in Docker
 ```
 
 ## How It Works

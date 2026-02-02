@@ -75,16 +75,7 @@ Binary is copied from builder stage. No build tools, no source code, no `node_mo
 
 ```bash
 bun run docker:build     # Build image and extract binary to ./output/
-docker compose run --rm cli diagram.excalidraw   # Run conversion
 ```
-
-### Docker Compose
-
-Two services in `docker-compose.yml`:
-
-- **`build`** — compiles the binary inside Docker and copies it to `./output/` on the host
-- **`cli`** — runs conversions directly: `docker compose run --rm cli <file.excalidraw>`
-  - Mounts current directory as `/data`
 
 ## Native Linux Bundle (`Dockerfile.native`)
 
