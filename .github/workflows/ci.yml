@@ -102,7 +102,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/excalirender-linux-x64.tar.gz
+          files: |
+            dist/excalirender-linux-x64.tar.gz
+            install.sh
 
   docker-publish:
     runs-on: ubuntu-latest
