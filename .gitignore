@@ -14,6 +14,7 @@ excalidraw
 
 # Test outputs
 *.png
+!tests/visual/baselines/*.png
 
 # OS files
 .DS_Store
