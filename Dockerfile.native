@@ -96,7 +96,8 @@ RUN mkdir -p /staging/etc/fonts && \
 # Create launcher shell script
 RUN printf '#!/bin/sh\n\
 set -e\n\
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"\n\
+SELF="$(readlink -f "$0")"\n\
+SCRIPT_DIR="$(cd "$(dirname "$SELF")" && pwd)"\n\
 BASE_DIR="$(dirname "$SCRIPT_DIR")"\n\
 export LD_LIBRARY_PATH="$BASE_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"\n\
 export FONTCONFIG_PATH="$BASE_DIR/etc/fonts"\n\
