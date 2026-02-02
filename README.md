@@ -6,21 +6,32 @@ CLI tool that converts [Excalidraw](https://excalidraw.com) `.excalidraw` files 
 
 ### Native Linux Binary
 
-Download the self-contained tarball from [GitHub Releases](https://github.com/jonarc/excalirender/releases) — no Docker or system libraries required.
+Install with a single command — no Docker or system libraries required:
 
 ```bash
-# Download and extract
-tar xzf excalirender-linux-x64.tar.gz
+# Using curl
+curl -fsSL https://raw.githubusercontent.com/JonRC/excalirender/main/install.sh | sh
 
-# Run directly
-./excalirender/bin/excalirender diagram.excalidraw
+# Using wget
+wget -qO- https://raw.githubusercontent.com/JonRC/excalirender/main/install.sh | sh
+```
 
-# Or add to PATH for convenience
-export PATH="$PWD/excalirender/bin:$PATH"
+Then run:
+
+```bash
 excalirender diagram.excalidraw
 ```
 
-The tarball bundles all shared libraries (Cairo, Pango, etc.) so it works on any Linux x64 system (Ubuntu 20.04+, Debian 11+, Fedora, etc.) with no additional dependencies.
+The install script downloads the self-contained tarball from [GitHub Releases](https://github.com/JonRC/excalirender/releases), which bundles all shared libraries (Cairo, Pango, etc.). Works on any Linux x64 system (Ubuntu 20.04+, Debian 11+, Fedora, etc.) with no additional dependencies.
+
+To install a specific version or customize the install location:
+
+```bash
+VERSION=v1.0.0 sh install.sh          # specific version
+PREFIX=/opt sh install.sh              # custom prefix
+```
+
+See [docs/LINUX-INSTALLATION.md](docs/LINUX-INSTALLATION.md) for full details on install locations, uninstall, and how the script works.
 
 ### Docker
 
