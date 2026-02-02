@@ -1,0 +1,67 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "visual-test",
+  "elements": [
+    {
+      "id": "rect-dark",
+      "type": "rectangle",
+      "x": 50,
+      "y": 50,
+      "width": 150,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 6001,
+      "angle": 0,
+      "isDeleted": false
+    },
+    {
+      "id": "text-dark",
+      "type": "text",
+      "x": 50,
+      "y": 180,
+      "width": 200,
+      "height": 30,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 1,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 6002,
+      "angle": 0,
+      "text": "Dark Mode Test",
+      "fontSize": 24,
+      "fontFamily": 1,
+      "textAlign": "left",
+      "lineHeight": 1.25,
+      "isDeleted": false
+    },
+    {
+      "id": "ellipse-dark",
+      "type": "ellipse",
+      "x": 250,
+      "y": 50,
+      "width": 120,
+      "height": 80,
+      "strokeColor": "#e03131",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 6003,
+      "angle": 0,
+      "isDeleted": false
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

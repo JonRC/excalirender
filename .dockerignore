@@ -1,0 +1,11 @@
+node_modules
+excalirender
+*.png
+.git
+excalidraw/
+output/
+dist/
+backlog.md
+scripts/
+.yarnrc.yml
+package-lock.json

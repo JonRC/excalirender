@@ -1,0 +1,116 @@
+# Dockerfile.native — builds a self-contained Linux x64 tarball
+# that runs without Docker and without system Cairo/Pango packages.
+#
+# Uses Debian Bullseye (glibc 2.31) for broad compatibility with
+# Ubuntu 20.04+, Debian 11+, and most modern Linux distros.
+#
+# Usage:
+#   docker build -f Dockerfile.native -o dist .
+#
+# Output: dist/excalirender-linux-x64.tar.gz
+
+# Stage 1: Build the binary on Debian Bullseye (glibc 2.31)
+FROM debian:bullseye-slim AS builder
+
+# Install Bun
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl unzip ca-certificates \
+    && curl -fsSL https://bun.sh/install | bash \
+    && rm -rf /var/lib/apt/lists/*
+ENV PATH="/root/.bun/bin:$PATH"
+
+# Install build dependencies for node-canvas
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ pkg-config \
+    libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY package.json bun.lock* ./
+RUN bun install
+
+COPY . .
+RUN bun run build
+
+# Stage 2: Collect binary + all shared library dependencies into a tarball
+FROM debian:bullseye-slim AS packager
+
+# Install runtime libs so ldd can resolve all .so deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 \
+    libjpeg62-turbo libgif7 librsvg2-2 libpixman-1-0 \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy binary and canvas.node from builder
+COPY --from=builder /app/excalirender /staging/bin/excalirender.bin
+COPY --from=builder /app/node_modules/canvas/build/Release/canvas.node /tmp/canvas.node
+
+# Collect all shared library dependencies (excluding core glibc libs —
+# those MUST come from the host system to avoid version mismatches)
+RUN mkdir -p /staging/lib && \
+    # Collect deps from canvas.node (the native addon with Cairo/Pango deps)
+    ldd /tmp/canvas.node 2>/dev/null | awk '/=>/ {print $3}' | sort -u > /tmp/libs.txt && \
+    # Also collect deps from the main binary
+    ldd /staging/bin/excalirender.bin 2>/dev/null | awk '/=>/ {print $3}' | sort -u >> /tmp/libs.txt && \
+    # De-duplicate and copy all libraries, skipping core glibc
+    sort -u /tmp/libs.txt | while read lib; do \
+        base=$(basename "$lib"); \
+        case "$base" in \
+            libc.so*|libm.so*|libdl.so*|libpthread.so*|librt.so*|libresolv.so*|libnss_*|ld-linux*) \
+                ;; \
+            *) \
+                if [ -f "$lib" ]; then cp -L "$lib" /staging/lib/; fi ;; \
+        esac; \
+    done && \
+    # Recursively resolve any deps of deps (two passes for transitive deps)
+    for pass in 1 2; do \
+        for lib in /staging/lib/*.so*; do \
+            ldd "$lib" 2>/dev/null | awk '/=>/ {print $3}' | while read dep; do \
+                base=$(basename "$dep"); \
+                case "$base" in \
+                    libc.so*|libm.so*|libdl.so*|libpthread.so*|librt.so*|libresolv.so*|libnss_*|ld-linux*) \
+                        ;; \
+                    *) \
+                        if [ -f "$dep" ] && [ ! -f "/staging/lib/$base" ]; then \
+                            cp -L "$dep" /staging/lib/; \
+                        fi ;; \
+                esac; \
+            done; \
+        done; \
+    done
+
+# Create minimal fontconfig configuration
+RUN mkdir -p /staging/etc/fonts && \
+    cat > /staging/etc/fonts/fonts.conf << 'FONTCONFIG_EOF'
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <!-- Minimal fontconfig for excalirender native bundle.
+       Fonts are registered programmatically via registerFont();
+       this config just prevents fontconfig initialization errors. -->
+  <cachedir>/tmp/excalirender-fontcache</cachedir>
+</fontconfig>
+FONTCONFIG_EOF
+
+# Create launcher shell script
+RUN printf '#!/bin/sh\n\
+set -e\n\
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"\n\
+BASE_DIR="$(dirname "$SCRIPT_DIR")"\n\
+export LD_LIBRARY_PATH="$BASE_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"\n\
+export FONTCONFIG_PATH="$BASE_DIR/etc/fonts"\n\
+export FONTCONFIG_FILE="$BASE_DIR/etc/fonts/fonts.conf"\n\
+exec "$SCRIPT_DIR/excalirender.bin" "$@"\n' > /staging/bin/excalirender && \
+    chmod +x /staging/bin/excalirender && \
+    chmod +x /staging/bin/excalirender.bin
+
+# Package into tarball
+RUN mkdir -p /out /tarball/excalirender && \
+    cp -r /staging/bin /staging/lib /staging/etc /tarball/excalirender/ && \
+    tar czf /out/excalirender-linux-x64.tar.gz -C /tarball excalirender
+
+# Stage 3: Output stage (for docker build --output)
+FROM scratch
+COPY --from=packager /out/excalirender-linux-x64.tar.gz /

@@ -1,0 +1,67 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "visual-test",
+  "elements": [
+    {
+      "id": "rotated-rect",
+      "type": "rectangle",
+      "x": 100,
+      "y": 50,
+      "width": 150,
+      "height": 80,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 8001,
+      "angle": 0.5236,
+      "isDeleted": false
+    },
+    {
+      "id": "rotated-ellipse",
+      "type": "ellipse",
+      "x": 350,
+      "y": 50,
+      "width": 120,
+      "height": 80,
+      "strokeColor": "#e03131",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 8002,
+      "angle": -0.7854,
+      "isDeleted": false
+    },
+    {
+      "id": "rotated-text",
+      "type": "text",
+      "x": 100,
+      "y": 200,
+      "width": 200,
+      "height": 30,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 1,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 8003,
+      "angle": 0.3491,
+      "text": "Rotated Text",
+      "fontSize": 24,
+      "fontFamily": 1,
+      "textAlign": "left",
+      "lineHeight": 1.25,
+      "isDeleted": false
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

@@ -1,0 +1,43 @@
+{
+  "name": "excalirender",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "excalirender": "src/index.ts"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "build": "bun build --compile --target=bun-linux-x64 ./src/index.ts --outfile excalirender",
+    "build:minified": "bun build --compile --minify --target=bun-linux-x64 ./src/index.ts --outfile excalirender",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check ./src ./tests ./scripts",
+    "lint:fix": "biome check --write ./src ./tests ./scripts",
+    "test:visual": "bun run tests/visual/run.ts",
+    "test:visual:update": "bun run tests/visual/run.ts --update",
+    "docker:build": "docker build -t excalirender-builder . && docker run --rm --entrypoint cp -v $(pwd):/output excalirender-builder /excalirender /output/",
+    "build:native": "docker build -f Dockerfile.native -o dist .",
+    "test:native": "bun run tests/native/run.ts"
+  },
+  "keywords": ["excalidraw", "cli", "png", "export"],
+  "author": "",
+  "license": "MIT",
+  "description": "CLI tool to convert .excalidraw files to PNG and SVG images",
+  "dependencies": {
+    "canvas": "^3.2.1",
+    "commander": "^14.0.2",
+    "perfect-freehand": "^1.2.0",
+    "points-on-curve": "^1.0.1",
+    "roughjs": "^4.6.6"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.13",
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/node": "^25.0.10",
+    "@types/pngjs": "^6.0.5",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
+    "typescript": "^5.9.3",
+    "wawoff2": "^2.0.1"
+  }
+}

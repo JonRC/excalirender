@@ -1,0 +1,82 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "visual-test",
+  "elements": [
+    {
+      "id": "rounded-rect-proportional",
+      "type": "rectangle",
+      "x": 50,
+      "y": 50,
+      "width": 150,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 9001,
+      "angle": 0,
+      "roundness": { "type": 2 },
+      "isDeleted": false
+    },
+    {
+      "id": "rounded-rect-adaptive",
+      "type": "rectangle",
+      "x": 250,
+      "y": 50,
+      "width": 150,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 9002,
+      "angle": 0,
+      "roundness": { "type": 3 },
+      "isDeleted": false
+    },
+    {
+      "id": "rounded-diamond",
+      "type": "diamond",
+      "x": 450,
+      "y": 50,
+      "width": 120,
+      "height": 120,
+      "strokeColor": "#e03131",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 9003,
+      "angle": 0,
+      "roundness": { "type": 2 },
+      "isDeleted": false
+    },
+    {
+      "id": "sharp-rect",
+      "type": "rectangle",
+      "x": 50,
+      "y": 200,
+      "width": 150,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffec99",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 9004,
+      "angle": 0,
+      "isDeleted": false
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

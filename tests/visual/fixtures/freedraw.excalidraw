@@ -1,0 +1,164 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "visual-test",
+  "elements": [
+    {
+      "id": "freedraw-pressure",
+      "type": "freedraw",
+      "x": 50,
+      "y": 50,
+      "width": 200,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 7001,
+      "angle": 0,
+      "points": [
+        [0, 50], [20, 30], [40, 45], [60, 20], [80, 35],
+        [100, 10], [120, 40], [140, 25], [160, 50], [180, 30],
+        [200, 45]
+      ],
+      "pressures": [0.5, 0.6, 0.7, 0.8, 0.7, 0.6, 0.5, 0.6, 0.7, 0.6, 0.5],
+      "simulatePressure": false,
+      "isDeleted": false
+    },
+    {
+      "id": "freedraw-simulated",
+      "type": "freedraw",
+      "x": 50,
+      "y": 180,
+      "width": 200,
+      "height": 80,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 4,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 7002,
+      "angle": 0,
+      "points": [
+        [0, 40], [25, 0], [50, 40], [75, 80], [100, 40],
+        [125, 0], [150, 40], [175, 80], [200, 40]
+      ],
+      "simulatePressure": true,
+      "isDeleted": false
+    },
+    {
+      "id": "freedraw-thin",
+      "type": "freedraw",
+      "x": 50,
+      "y": 310,
+      "width": 200,
+      "height": 40,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 1,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 7003,
+      "angle": 0,
+      "points": [
+        [0, 20], [20, 0], [40, 20], [60, 40], [80, 20],
+        [100, 0], [120, 20], [140, 40], [160, 20], [180, 0], [200, 20]
+      ],
+      "simulatePressure": true,
+      "isDeleted": false
+    },
+    {
+      "id": "freedraw-thick",
+      "type": "freedraw",
+      "x": 50,
+      "y": 390,
+      "width": 200,
+      "height": 60,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 8,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 7004,
+      "angle": 0,
+      "points": [
+        [0, 30], [40, 0], [80, 30], [120, 60], [160, 30], [200, 0]
+      ],
+      "simulatePressure": true,
+      "isDeleted": false
+    },
+    {
+      "id": "freedraw-minimal",
+      "type": "freedraw",
+      "x": 300,
+      "y": 50,
+      "width": 80,
+      "height": 0,
+      "strokeColor": "#862e9c",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 7005,
+      "angle": 0,
+      "points": [
+        [0, 0], [40, 20], [80, 0]
+      ],
+      "simulatePressure": true,
+      "isDeleted": false
+    },
+    {
+      "id": "freedraw-opacity",
+      "type": "freedraw",
+      "x": 300,
+      "y": 140,
+      "width": 150,
+      "height": 60,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 3,
+      "roughness": 1,
+      "opacity": 40,
+      "seed": 7006,
+      "angle": 0,
+      "points": [
+        [0, 30], [30, 0], [60, 30], [90, 60], [120, 30], [150, 0]
+      ],
+      "simulatePressure": true,
+      "isDeleted": false
+    },
+    {
+      "id": "freedraw-rotated",
+      "type": "freedraw",
+      "x": 300,
+      "y": 260,
+      "width": 150,
+      "height": 50,
+      "strokeColor": "#e8590c",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 7007,
+      "angle": 0.3491,
+      "points": [
+        [0, 25], [25, 0], [50, 25], [75, 50], [100, 25],
+        [125, 0], [150, 25]
+      ],
+      "simulatePressure": true,
+      "isDeleted": false
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

@@ -1,0 +1,139 @@
+# excalirender
+
+CLI tool that converts [Excalidraw](https://excalidraw.com) `.excalidraw` files to PNG and SVG images. Runs as a standalone binary compiled with [Bun](https://bun.sh), available as a Docker image or a self-contained native Linux binary.
+
+## Quick Start
+
+### Native Linux Binary
+
+Download the self-contained tarball from [GitHub Releases](https://github.com/jonarc/excalirender/releases) — no Docker or system libraries required.
+
+```bash
+# Download and extract
+tar xzf excalirender-linux-x64.tar.gz
+
+# Run directly
+./excalirender/bin/excalirender diagram.excalidraw
+
+# Or add to PATH for convenience
+export PATH="$PWD/excalirender/bin:$PATH"
+excalirender diagram.excalidraw
+```
+
+The tarball bundles all shared libraries (Cairo, Pango, etc.) so it works on any Linux x64 system (Ubuntu 20.04+, Debian 11+, Fedora, etc.) with no additional dependencies.
+
+### Docker
+
+```bash
+docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender diagram.excalidraw
+```
+
+This converts `diagram.excalidraw` to `diagram.png` in the current directory.
+
+### Docker Compose
+
+```bash
+docker compose run --rm cli diagram.excalidraw
+```
+
+## Usage
+
+```
+excalirender <input> [options]
+```
+
+### Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <path>` | Output PNG file path | `<input>.png` |
+| `-s, --scale <number>` | Export scale factor | `1` |
+| `-b, --background <color>` | Background color (hex) | From file or `#ffffff` |
+| `-d, --dark` | Enable dark mode export | `false` |
+
+### Examples
+
+```bash
+# Basic conversion
+docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw
+
+# Custom output path
+docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw -o output.png
+
+# 2x resolution
+docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw -s 2
+
+# Dark mode
+docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw --dark
+
+# Custom background color
+docker run --rm -v "$(pwd):/data" -w /data jonarc/excalirender drawing.excalidraw -b "#f0f0f0"
+```
+
+## Supported Elements
+
+| Element | Status | Notes |
+|---------|--------|-------|
+| Rectangle | Supported | Including rounded corners |
+| Diamond | Supported | |
+| Ellipse | Supported | |
+| Line | Supported | Single segment and multi-point curves |
+| Arrow | Supported | With start/end arrowheads |
+| Freedraw | Supported | Pressure-sensitive strokes, closed-path fill |
+| Text | Supported | Multi-line, 7 font families, alignment |
+| Image | Supported | PNG/JPEG/SVG with rounded corners, dark mode inversion |
+| Frame | Supported | Clipping, labels, rotation |
+| Embeddable | Supported | Rendered as placeholder with URL |
+
+### Rendering Features
+
+- **Fill styles**: hachure, cross-hatch, solid, zigzag (via Rough.js)
+- **Stroke styles**: solid, dashed, dotted
+- **Opacity**: per-element
+- **Rotation**: full rotation support
+- **Dark mode**: color inversion matching Excalidraw's algorithm, including image pixel transformation
+- **Fonts**: Excalifont, Nunito, Comic Shanns, Liberation Sans, Lilita One, Virgil, Cascadia — with Cyrillic, Greek, and Latin Extended unicode support
+- **Output formats**: PNG and SVG (with embedded fonts)
+
+## Building from Source
+
+Requires [Bun](https://bun.sh) and system libraries for [node-canvas](https://github.com/Automattic/node-canvas) (Cairo, Pango, etc.).
+
+```bash
+# Install dependencies
+bun install
+
+# Build standalone binary (Linux x64) — requires system Cairo/Pango
+bun run build
+
+# Build Docker image and extract binary
+bun run docker:build
+
+# Build self-contained native tarball (no system libs needed at runtime)
+bun run build:native
+# Output: dist/excalirender-linux-x64.tar.gz
+```
+
+See [docs/BUILD.md](docs/BUILD.md) for details on the Docker build, native bundle, and system dependencies.
+
+## Development
+
+```bash
+bun run start -- <file.excalidraw>   # Run from source
+bun run typecheck                     # TypeScript check
+docker compose run --rm cli <file>    # Run in Docker
+```
+
+## How It Works
+
+The rendering pipeline reads `.excalidraw` JSON files and draws elements to a server-side canvas using the same libraries Excalidraw uses:
+
+- [Rough.js](https://roughjs.com/) for hand-drawn shapes
+- [perfect-freehand](https://github.com/steveruizok/perfect-freehand) for pressure-sensitive strokes
+- [node-canvas](https://github.com/Automattic/node-canvas) for server-side rendering
+
+See [docs/CONVERSION.md](docs/CONVERSION.md) for the full rendering pipeline documentation.
+
+## License
+
+MIT

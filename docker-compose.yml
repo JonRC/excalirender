@@ -1,0 +1,15 @@
+services:
+  # Extract binary to ./output directory
+  build:
+    build: .
+    entrypoint: ["cp"]
+    command: ["/excalirender", "/output/"]
+    volumes:
+      - ./output:/output
+
+  # Run the CLI directly from Docker
+  cli:
+    build: .
+    volumes:
+      - .:/data
+    working_dir: /data

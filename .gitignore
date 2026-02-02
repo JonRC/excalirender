@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+excalirender
+output/
+
+# Test diffs
+tests/visual/diffs/
+
+# Cloned excalidraw repo
+excalidraw
+
+# Test outputs
+*.png
+
+# OS files
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+excalirender
+
+.claude
+
+backlog.md
+
+CLAUDE.md
