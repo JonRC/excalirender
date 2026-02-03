@@ -1,5 +1,6 @@
 import { basename } from "node:path";
 import { Command } from "commander";
+import packageJson from "../package.json" with { type: "json" };
 import type { ExportOptions } from "./types.js";
 
 export interface CLIArgs {
@@ -13,7 +14,7 @@ export function parseArgs(): CLIArgs {
   program
     .name("excalirender")
     .description("Convert .excalidraw files to PNG or SVG")
-    .version("1.0.0")
+    .version(packageJson.version)
     .argument("<input>", "Input .excalidraw file")
     .option(
       "-o, --output <path>",
