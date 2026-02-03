@@ -6,6 +6,12 @@ on:
     tags: ["v*"]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to build (branch, tag, or SHA)'
+        required: false
+        default: 'main'
 
 env:
   DOCKER_IMAGE: jonarc06/excalirender
