@@ -298,6 +298,7 @@ function renderText(
   offsetY: number,
   ct: ColorTransform,
   sceneBgColor?: string,
+  elementsById?: Map<string, ExcalidrawElement>,
 ) {
   const x = element.x + offsetX;
   const y = element.y + offsetY;
@@ -310,21 +311,26 @@ function renderText(
 
   if (!text) return;
 
-  // If this text is bound to a container (arrow), draw an opaque background
-  // rectangle to mask the arrow line underneath, creating the visual gap
+  // If this text is bound to an arrow container, draw an opaque background
+  // rectangle to mask the arrow line underneath, creating the visual gap.
+  // Only do this for arrows - other containers (rectangle, ellipse, diamond)
+  // should show text on top of their own background fill without masking.
   const containerId = element.containerId as string | null;
-  if (containerId && sceneBgColor) {
-    const padding = 4;
-    ctx.save();
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = sceneBgColor;
-    ctx.fillRect(
-      x - padding,
-      y - padding,
-      (element.width || 0) + padding * 2,
-      (element.height || 0) + padding * 2,
-    );
-    ctx.restore();
+  if (containerId && sceneBgColor && elementsById) {
+    const container = elementsById.get(containerId);
+    if (container && container.type === "arrow") {
+      const padding = 4;
+      ctx.save();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = sceneBgColor;
+      ctx.fillRect(
+        x - padding,
+        y - padding,
+        (element.width || 0) + padding * 2,
+        (element.height || 0) + padding * 2,
+      );
+      ctx.restore();
+    }
   }
 
   ctx.save();
@@ -654,6 +660,7 @@ function renderElement(
   imageCache: Map<string, Image>,
   darkMode: boolean,
   sceneBgColor?: string,
+  elementsById?: Map<string, ExcalidrawElement>,
 ) {
   if (element.isDeleted) return;
 
@@ -691,7 +698,15 @@ function renderElement(
       renderFreedraw(rc, ctx, element, offsetX, offsetY, ct);
       break;
     case "text":
-      renderText(ctx, element, offsetX, offsetY, ct, sceneBgColor);
+      renderText(
+        ctx,
+        element,
+        offsetX,
+        offsetY,
+        ct,
+        sceneBgColor,
+        elementsById,
+      );
       break;
     case "image":
       renderImage(ctx, element, offsetX, offsetY, imageCache, darkMode);
@@ -778,6 +793,7 @@ export async function exportToPng(
         imageCache,
         options.darkMode,
         backgroundColor,
+        elementsById,
       );
     }
     ctx.restore();
@@ -800,6 +816,7 @@ export async function exportToPng(
             imageCache,
             options.darkMode,
             backgroundColor,
+            elementsById,
           );
           ctx.restore();
           continue;
@@ -815,6 +832,7 @@ export async function exportToPng(
         imageCache,
         options.darkMode,
         backgroundColor,
+        elementsById,
       );
     }
   }
