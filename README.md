@@ -42,7 +42,8 @@ excalirender <input> [options]
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `-o, --output <path>` | Output PNG file path | `<input>.png` |
+| `-r, --recursive` | Convert all .excalidraw files in directory | `false` |
+| `-o, --output <path>` | Output file path, or directory (with -r) | `<input>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-b, --background <color>` | Background color (hex) | From file or `#ffffff` |
 | `-d, --dark` | Enable dark mode export | `false` |
@@ -57,7 +58,17 @@ excalirender drawing.excalidraw -b "#f0f0f0"       # Custom background
 excalirender drawing.excalidraw -o out.svg         # SVG output
 ```
 
-For Docker, prefix with `docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender`.
+### Recursive Conversion
+
+Convert all `.excalidraw` files in a directory and its subdirectories:
+
+```bash
+excalirender -r ./diagrams              # Output alongside input files
+excalirender -r ./diagrams -o ./output  # Output to specific directory
+excalirender -r ./diagrams --dark -s 2  # With options
+```
+
+For Docker, prefix commands with `docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender`.
 
 ## How It Works
 
