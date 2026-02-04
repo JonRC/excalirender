@@ -18,7 +18,9 @@
     "docker:build": "docker build -t excalirender-builder . && docker run --rm --entrypoint cp -v $(pwd):/output excalirender-builder /excalirender /output/",
     "build:native": "docker build -f Dockerfile.native -o dist .",
     "test:native": "bun run tests/native/run.ts",
-    "test:recursive": "bun run tests/recursive/run.ts"
+    "test:recursive": "bun run tests/recursive/run.ts",
+    "test:unit": "bun run tests/recursive/run.ts --unit-only",
+    "test:diff": "bun run tests/diff/run.ts"
   },
   "keywords": ["excalidraw", "cli", "png", "export"],
   "author": "",

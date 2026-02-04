@@ -465,6 +465,8 @@ async function testRecursiveEmptyDir() {
 // ============================================================================
 
 async function main() {
+  const unitOnly = process.argv.includes("--unit-only");
+
   console.log("Recursive Feature Tests");
   console.log("=".repeat(50));
 
@@ -478,12 +480,14 @@ async function main() {
   await testScannerFileNotDir();
   await testScannerWithFixtures();
 
-  console.log("\nIntegration Tests (Recursive Mode via Docker):");
-  await testRecursiveBasic();
-  await testRecursiveInPlace();
-  await testRecursiveWithOptions();
-  await testRecursiveErrorHandling();
-  await testRecursiveEmptyDir();
+  if (!unitOnly) {
+    console.log("\nIntegration Tests (Recursive Mode via Docker):");
+    await testRecursiveBasic();
+    await testRecursiveInPlace();
+    await testRecursiveWithOptions();
+    await testRecursiveErrorHandling();
+    await testRecursiveEmptyDir();
+  }
 
   cleanup();
 

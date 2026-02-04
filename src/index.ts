@@ -2,6 +2,11 @@
 
 import { basename, dirname, join, relative } from "node:path";
 import { parseArgs } from "./cli.js";
+import {
+  exportDiffToExcalidraw,
+  exportDiffToPng,
+  exportDiffToSvg,
+} from "./diff.js";
 import { exportToPng } from "./export.js";
 import { exportToSvg } from "./export-svg.js";
 import { findExcalidrawFiles } from "./scanner.js";
@@ -119,15 +124,29 @@ async function processRecursive(
 
 async function main() {
   try {
-    const { inputPath, recursive, outputDir, options } = parseArgs();
+    const args = parseArgs();
 
-    if (recursive) {
-      await processRecursive(inputPath, outputDir, options);
-    } else {
-      if (options.outputPath.endsWith(".svg")) {
-        await exportToSvg(inputPath, options);
+    if (args.command === "diff") {
+      const { oldPath, newPath, options } = args;
+
+      if (options.outputPath.endsWith(".excalidraw")) {
+        await exportDiffToExcalidraw(oldPath, newPath, options);
+      } else if (options.outputPath.endsWith(".svg")) {
+        await exportDiffToSvg(oldPath, newPath, options);
       } else {
-        await exportToPng(inputPath, options);
+        await exportDiffToPng(oldPath, newPath, options);
+      }
+    } else {
+      const { inputPath, recursive, outputDir, options } = args;
+
+      if (recursive) {
+        await processRecursive(inputPath, outputDir, options);
+      } else {
+        if (options.outputPath.endsWith(".svg")) {
+          await exportToSvg(inputPath, options);
+        } else {
+          await exportToPng(inputPath, options);
+        }
       }
     }
   } catch (error) {

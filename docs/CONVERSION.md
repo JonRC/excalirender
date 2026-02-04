@@ -1,8 +1,24 @@
-# Conversion: .excalidraw to PNG
+# Conversion: .excalidraw to PNG/SVG
 
 ## Origin
 
 The rendering logic is a custom clean-room implementation inspired by Excalidraw's architecture. It is **not** a port of Excalidraw's export code — the rendering pipeline was written from scratch using the same underlying libraries.
+
+## Output Format
+
+The output format is determined by the `-o`/`--output` file extension:
+
+| Extension | Format | Notes |
+|-----------|--------|-------|
+| `.svg` | SVG | Vector format, scalable |
+| `.png` | PNG | Raster format (default) |
+| (none) | PNG | Default when no extension specified |
+
+Examples:
+- `excalirender diagram.excalidraw -o output.svg` → SVG output
+- `excalirender diagram.excalidraw -o output.png` → PNG output
+- `excalirender diagram.excalidraw -o output` → PNG output (default)
+- `excalirender diagram.excalidraw` → `diagram.png` (default)
 
 ## Fonts
 

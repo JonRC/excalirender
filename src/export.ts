@@ -14,6 +14,7 @@ import {
   type Angle,
   applyDarkModeFilter,
   applyDarkModeToImageData,
+  type Bounds,
   type ColorTransform,
   FONT_FAMILY,
   FRAME_STYLE,
@@ -847,6 +848,111 @@ export async function exportToPng(
       console.log(`Exported to ${options.outputPath}`);
       resolve();
     });
+    out.on("error", reject);
+  });
+}
+
+/**
+ * Options for rendering pre-styled elements to PNG.
+ */
+export interface RenderOptions {
+  outputPath: string;
+  scale: number;
+  bounds: Bounds;
+  width: number;
+  height: number;
+  backgroundColor: string;
+  ct: ColorTransform;
+  darkMode: boolean;
+  files: Record<string, { dataURL: string }>;
+  /** Optional callback to render additional content after elements (e.g., diff tags) */
+  afterRender?: (
+    ctx: CanvasRenderingContext2D,
+    offsetX: number,
+    offsetY: number,
+  ) => void;
+}
+
+/**
+ * Export pre-styled elements to PNG.
+ * Used by diff export to render elements with custom styling.
+ */
+export async function exportToPngWithElements(
+  elements: ExcalidrawElement[],
+  options: RenderOptions,
+): Promise<void> {
+  // Register fonts first
+  registerFonts();
+
+  // Create canvas
+  const canvas = createCanvas(options.width, options.height);
+  const ctx = canvas.getContext("2d");
+
+  // Apply scale
+  ctx.scale(options.scale, options.scale);
+
+  // Fill background
+  ctx.fillStyle = options.backgroundColor;
+  ctx.fillRect(
+    0,
+    0,
+    options.width / options.scale,
+    options.height / options.scale,
+  );
+
+  // Create rough canvas
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rc = (rough as any).canvas(canvas) as RoughCanvas;
+
+  // Calculate offset to translate elements to canvas coordinates
+  const offsetX = -options.bounds.minX;
+  const offsetY = -options.bounds.minY;
+
+  // Preload images into cache
+  const imageCache = new Map<string, Image>();
+  for (const [fileId, fileData] of Object.entries(options.files)) {
+    try {
+      const img = await loadImage(fileData.dataURL);
+      imageCache.set(fileId, img);
+    } catch (err) {
+      console.warn(`Failed to load image ${fileId}:`, err);
+    }
+  }
+
+  // Build element map for text label masking
+  const elementsById = new Map<string, ExcalidrawElement>();
+  for (const element of elements) {
+    elementsById.set(element.id, element);
+  }
+
+  // Render elements (no frame clipping for diff export)
+  for (const element of elements) {
+    renderElement(
+      rc,
+      ctx,
+      element,
+      offsetX,
+      offsetY,
+      options.ct,
+      imageCache,
+      options.darkMode,
+      options.backgroundColor,
+      elementsById,
+    );
+  }
+
+  // Call afterRender callback if provided (e.g., for diff tags)
+  if (options.afterRender) {
+    options.afterRender(ctx, offsetX, offsetY);
+  }
+
+  // Write PNG to file
+  return new Promise((resolve, reject) => {
+    const out = createWriteStream(options.outputPath);
+    const stream = canvas.createPNGStream();
+
+    stream.pipe(out);
+    out.on("finish", resolve);
     out.on("error", reject);
   });
 }
