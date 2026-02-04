@@ -6,7 +6,7 @@ import type { CanvasRenderingContext2D } from "canvas";
 import { applyUnchangedStyle, computeDiff } from "./diff-core.js";
 import {
   type DiffOptions,
-  DiffStatus,
+  type DiffStatus,
   getElementBounds,
   TAG_COLORS,
 } from "./diff-excalidraw.js";
@@ -20,8 +20,8 @@ export { computeDiff, type DiffResult } from "./diff-core.js";
 
 // Re-export from diff-excalidraw for backwards compatibility
 export {
-  exportDiffToExcalidraw,
   type DiffOptions,
+  exportDiffToExcalidraw,
 } from "./diff-excalidraw.js";
 
 /** Element with its diff status for tag rendering */

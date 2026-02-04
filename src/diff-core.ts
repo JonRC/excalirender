@@ -104,7 +104,8 @@ export function computeDiff(oldPath: string, newPath: string): DiffResult {
 
   const added: ExcalidrawElement[] = [];
   const removed: ExcalidrawElement[] = [];
-  const modified: Array<{ old: ExcalidrawElement; new: ExcalidrawElement }> = [];
+  const modified: Array<{ old: ExcalidrawElement; new: ExcalidrawElement }> =
+    [];
   const unchanged: ExcalidrawElement[] = [];
 
   // Categorize new elements

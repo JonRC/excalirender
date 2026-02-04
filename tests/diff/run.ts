@@ -5,7 +5,13 @@
  *   bun run test:diff
  */
 
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { generateDefaultDiffOutput } from "../../src/cli.js";
 import { computeDiff } from "../../src/diff-core.js";
@@ -466,7 +472,11 @@ async function testModifiedSizeChange() {
   try {
     const oldFile = createExcalidrawFile([createRectElement("elem-a", 0, 0)]);
     // Same ID but different size
-    const newElement = { ...createRectElement("elem-a", 0, 0), width: 200, height: 200 };
+    const newElement = {
+      ...createRectElement("elem-a", 0, 0),
+      width: 200,
+      height: 200,
+    };
     const newFile = createExcalidrawFile([newElement]);
 
     const oldPath = join(TEMP_DIR, "modified-size-old.excalidraw");
@@ -496,7 +506,10 @@ async function testModifiedColorChange() {
   try {
     const oldFile = createExcalidrawFile([createRectElement("elem-a", 0, 0)]);
     // Same ID but different color
-    const newElement = { ...createRectElement("elem-a", 0, 0), strokeColor: "#ff0000" };
+    const newElement = {
+      ...createRectElement("elem-a", 0, 0),
+      strokeColor: "#ff0000",
+    };
     const newFile = createExcalidrawFile([newElement]);
 
     const oldPath = join(TEMP_DIR, "modified-color-old.excalidraw");
@@ -749,7 +762,10 @@ async function testModifiedTextChange() {
     const oldFile = createExcalidrawFile([
       createTextElement("text-1", "Hello", 0, 0),
     ]);
-    const newElement = { ...createTextElement("text-1", "Hello", 0, 0), text: "World" };
+    const newElement = {
+      ...createTextElement("text-1", "Hello", 0, 0),
+      text: "World",
+    };
     const newFile = createExcalidrawFile([newElement]);
 
     const oldPath = join(TEMP_DIR, "modified-text-old.excalidraw");
@@ -778,11 +794,30 @@ async function testModifiedPointsChange() {
   const testName = "computeDiff: detects points array change as modified";
   try {
     const oldFile = createExcalidrawFile([
-      createLineElement("line-1", [[0, 0], [100, 100]], 0, 0),
+      createLineElement(
+        "line-1",
+        [
+          [0, 0],
+          [100, 100],
+        ],
+        0,
+        0,
+      ),
     ]);
     const newElement = {
-      ...createLineElement("line-1", [[0, 0], [100, 100]], 0, 0),
-      points: [[0, 0], [200, 200]],
+      ...createLineElement(
+        "line-1",
+        [
+          [0, 0],
+          [100, 100],
+        ],
+        0,
+        0,
+      ),
+      points: [
+        [0, 0],
+        [200, 200],
+      ],
     };
     const newFile = createExcalidrawFile([newElement]);
 
@@ -874,7 +909,10 @@ async function testModifiedAngleUndefinedVsZero() {
     // Old element has angle: 0 (from createRectElement)
     const oldFile = createExcalidrawFile([createRectElement("elem-a", 0, 0)]);
     // New element has angle: undefined (explicitly removed)
-    const newElement = createRectElement("elem-a", 0, 0) as Record<string, unknown>;
+    const newElement = createRectElement("elem-a", 0, 0) as Record<
+      string,
+      unknown
+    >;
     delete newElement.angle;
     const newFile = createExcalidrawFile([newElement]);
 
@@ -908,7 +946,10 @@ async function testModifiedAngleUndefinedVsZero() {
 async function testDefaultOutputBasic() {
   const testName = "generateDefaultDiffOutput: basic filenames";
   try {
-    const result = generateDefaultDiffOutput("old.excalidraw", "new.excalidraw");
+    const result = generateDefaultDiffOutput(
+      "old.excalidraw",
+      "new.excalidraw",
+    );
     if (result !== "old_vs_new.png") {
       fail(testName, `Expected "old_vs_new.png", got "${result}"`);
       return;
@@ -954,7 +995,8 @@ async function testDefaultOutputSpecialNames() {
 }
 
 async function testExcalidrawOutputFormat() {
-  const testName = "exportDiffToExcalidraw: creates valid JSON with correct structure";
+  const testName =
+    "exportDiffToExcalidraw: creates valid JSON with correct structure";
   try {
     const oldFile = createExcalidrawFile([createRectElement("elem-a", 0, 0)]);
     const newFile = createExcalidrawFile([
@@ -1013,7 +1055,8 @@ async function testExcalidrawOutputFormat() {
 }
 
 async function testExcalidrawOutputHasTags() {
-  const testName = "exportDiffToExcalidraw: includes diff tags as text elements";
+  const testName =
+    "exportDiffToExcalidraw: includes diff tags as text elements";
   try {
     const oldFile = createExcalidrawFile([createRectElement("elem-a", 0, 0)]);
     const newFile = createExcalidrawFile([
@@ -1035,7 +1078,9 @@ async function testExcalidrawOutputHasTags() {
     });
 
     const content = readFileSync(outputPath, "utf-8");
-    const parsed = JSON.parse(content) as { elements: Array<{ type: string; text?: string }> };
+    const parsed = JSON.parse(content) as {
+      elements: Array<{ type: string; text?: string }>;
+    };
 
     // Find text elements that are tags
     const textElements = parsed.elements.filter((el) => el.type === "text");
@@ -1081,7 +1126,9 @@ async function testExcalidrawOutputNoTagsOption() {
     });
 
     const content = readFileSync(outputPath, "utf-8");
-    const parsed = JSON.parse(content) as { elements: Array<{ type: string; text?: string }> };
+    const parsed = JSON.parse(content) as {
+      elements: Array<{ type: string; text?: string }>;
+    };
 
     // Find text elements that are tags
     const textElements = parsed.elements.filter((el) => el.type === "text");

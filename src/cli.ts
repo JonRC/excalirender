@@ -24,7 +24,10 @@ export type CLIArgs = ExportCLIArgs | DiffCLIArgs;
 /**
  * Generate default output filename for diff command.
  */
-export function generateDefaultDiffOutput(oldPath: string, newPath: string): string {
+export function generateDefaultDiffOutput(
+  oldPath: string,
+  newPath: string,
+): string {
   const oldBase = basename(oldPath, ".excalidraw");
   const newBase = basename(newPath, ".excalidraw");
   return `${oldBase}_vs_${newBase}.png`;
@@ -56,8 +59,7 @@ function parseDiffArgs(): DiffCLIArgs {
   }
 
   // Generate default output name if not specified
-  const outputPath =
-    opts.output || generateDefaultDiffOutput(args[0], args[1]);
+  const outputPath = opts.output || generateDefaultDiffOutput(args[0], args[1]);
 
   return {
     command: "diff",
