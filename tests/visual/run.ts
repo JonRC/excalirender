@@ -41,6 +41,7 @@ const MAX_DIFF_PERCENT = 1.0;
 const MAX_SVG_DIFF_PERCENT = 5.0;
 
 type TestFormat = "png" | "svg";
+type TestType = "export" | "diff";
 
 interface TestCase {
   name: string;
@@ -50,6 +51,8 @@ interface TestCase {
   darkMode: boolean;
   scale: number;
   format: TestFormat;
+  type: TestType;
+  diffNewFixture?: string; // For diff tests: the "new" file
 }
 
 function discoverTests(): TestCase[] {
@@ -61,6 +64,9 @@ function discoverTests(): TestCase[] {
   for (const fixture of fixtures) {
     const name = parse(fixture).name;
 
+    // Skip diff fixtures from regular export tests
+    if (name.startsWith("diff-")) continue;
+
     // PNG test
     tests.push({
       name,
@@ -70,6 +76,7 @@ function discoverTests(): TestCase[] {
       darkMode: false,
       scale: 1,
       format: "png",
+      type: "export",
     });
 
     // SVG test (rendered to PNG via resvg for comparison)
@@ -81,6 +88,7 @@ function discoverTests(): TestCase[] {
       darkMode: false,
       scale: 1,
       format: "svg",
+      type: "export",
     });
 
     // Add dark mode variants for fixtures that test dark mode behavior
@@ -93,6 +101,7 @@ function discoverTests(): TestCase[] {
         darkMode: true,
         scale: 1,
         format: "png",
+        type: "export",
       });
 
       tests.push({
@@ -103,8 +112,80 @@ function discoverTests(): TestCase[] {
         darkMode: true,
         scale: 1,
         format: "svg",
+        type: "export",
       });
     }
+  }
+
+  // Add diff tests if both diff-base and diff-modified exist
+  const diffBase = join(FIXTURES_DIR, "diff-base.excalidraw");
+  const diffModified = join(FIXTURES_DIR, "diff-modified.excalidraw");
+  if (existsSync(diffBase) && existsSync(diffModified)) {
+    // PNG diff test
+    tests.push({
+      name: "diff-test",
+      fixture: diffBase,
+      diffNewFixture: diffModified,
+      outputName: "diff-test.png",
+      baselineName: "diff-test.png",
+      darkMode: false,
+      scale: 1,
+      format: "png",
+      type: "diff",
+    });
+
+    // SVG diff test
+    tests.push({
+      name: "diff-test--svg",
+      fixture: diffBase,
+      diffNewFixture: diffModified,
+      outputName: "diff-test.svg",
+      baselineName: "diff-test--svg.png",
+      darkMode: false,
+      scale: 1,
+      format: "svg",
+      type: "diff",
+    });
+  }
+
+  // Add diff-changed test (tests modified objects specifically)
+  const diffChangedBase = join(FIXTURES_DIR, "diff-changed-base.excalidraw");
+  const diffChangedModified = join(
+    FIXTURES_DIR,
+    "diff-changed-modified.excalidraw",
+  );
+  if (existsSync(diffChangedBase) && existsSync(diffChangedModified)) {
+    tests.push({
+      name: "diff-changed-test",
+      fixture: diffChangedBase,
+      diffNewFixture: diffChangedModified,
+      outputName: "diff-changed-test.png",
+      baselineName: "diff-changed-test.png",
+      darkMode: false,
+      scale: 1,
+      format: "png",
+      type: "diff",
+    });
+  }
+
+  // Add diff-complex test (tests all diff types: added, removed, modified, unchanged)
+  const diffComplexBase = join(FIXTURES_DIR, "diff-complex-base.excalidraw");
+  const diffComplexModified = join(
+    FIXTURES_DIR,
+    "diff-complex-modified.excalidraw",
+  );
+  if (existsSync(diffComplexBase) && existsSync(diffComplexModified)) {
+    tests.push({
+      name: "diff-complex-test",
+      fixture: diffComplexBase,
+      diffNewFixture: diffComplexModified,
+      outputName: "diff-complex-test.png",
+      baselineName: "diff-complex-test.png",
+      darkMode: false,
+      scale: 1,
+      format: "png",
+      type: "diff",
+    });
   }
 
   return tests;
@@ -152,6 +233,44 @@ async function runCli(
   if (options.darkMode) args.push("--dark");
   if (options.scale && options.scale !== 1)
     args.push("-s", String(options.scale));
+
+  const proc = Bun.spawn(args, {
+    cwd: PROJECT_ROOT,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+
+  const exitCode = await proc.exited;
+  const stderr = await new Response(proc.stderr).text();
+
+  return { success: exitCode === 0, stderr };
+}
+
+async function runDiffCli(
+  oldPath: string,
+  newPath: string,
+  outputPath: string,
+): Promise<{ success: boolean; stderr: string }> {
+  // Convert paths to be relative to project root (Docker mounts project root as /data)
+  const relOld = relative(PROJECT_ROOT, oldPath);
+  const relNew = relative(PROJECT_ROOT, newPath);
+  const relOutput = relative(PROJECT_ROOT, outputPath);
+
+  const args = [
+    "docker",
+    "run",
+    "--rm",
+    "-v",
+    `${PROJECT_ROOT}:/data`,
+    "-w",
+    "/data",
+    "excalirender:test",
+    "diff",
+    relOld,
+    relNew,
+    "-o",
+    relOutput,
+  ];
 
   const proc = Bun.spawn(args, {
     cwd: PROJECT_ROOT,
@@ -340,10 +459,15 @@ async function main() {
     const diffPath = join(DIFFS_DIR, test.baselineName);
 
     // Generate output via Docker
-    const result = await runCli(test.fixture, outputPath, {
-      darkMode: test.darkMode,
-      scale: test.scale,
-    });
+    let result: { success: boolean; stderr: string };
+    if (test.type === "diff" && test.diffNewFixture) {
+      result = await runDiffCli(test.fixture, test.diffNewFixture, outputPath);
+    } else {
+      result = await runCli(test.fixture, outputPath, {
+        darkMode: test.darkMode,
+        scale: test.scale,
+      });
+    }
 
     if (!result.success) {
       console.log(`  FAIL  ${test.name} — CLI error: ${result.stderr.trim()}`);

@@ -8,6 +8,7 @@ import { generateFontFaceCSS } from "./fonts.js";
 import {
   type Angle,
   applyDarkModeFilter,
+  type Bounds,
   type ColorTransform,
   escapeXml,
   FONT_FAMILY,
@@ -727,4 +728,132 @@ export async function exportToSvg(
 
   writeFileSync(options.outputPath, svg, "utf-8");
   console.log(`Exported to ${options.outputPath}`);
+}
+
+/**
+ * Options for rendering pre-styled elements to SVG.
+ */
+export interface SvgRenderOptions {
+  outputPath: string;
+  scale: number;
+  bounds: Bounds;
+  width: number;
+  height: number;
+  backgroundColor: string;
+  ct: ColorTransform;
+  darkMode: boolean;
+  files: Record<string, { dataURL: string }>;
+  /** Optional callback to generate additional SVG content after elements (e.g., diff tags) */
+  afterRenderSvg?: (offsetX: number, offsetY: number) => string;
+}
+
+/**
+ * Export pre-styled elements to SVG.
+ * Used by diff export to render elements with custom styling.
+ */
+export async function exportToSvgWithElements(
+  elements: ExcalidrawElement[],
+  options: SvgRenderOptions,
+): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const gen = (rough as any).generator() as RoughGenerator;
+
+  const ox = -options.bounds.minX;
+  const oy = -options.bounds.minY;
+  const viewW = options.width / options.scale;
+  const viewH = options.height / options.scale;
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${options.width}" height="${options.height}" viewBox="0 0 ${viewW} ${viewH}">\n`;
+
+  // Background
+  svg += `<rect x="0" y="0" width="${viewW}" height="${viewH}" fill="${options.backgroundColor}"/>\n`;
+
+  // Collect used font families from text elements
+  const usedFontFamilyIds = new Set<number>();
+  for (const element of elements) {
+    if (element.type === "text" && element.fontFamily) {
+      usedFontFamilyIds.add(element.fontFamily as number);
+    }
+    if (
+      element.type === "frame" ||
+      element.type === "magicframe" ||
+      element.type === "embeddable" ||
+      element.type === "iframe"
+    ) {
+      usedFontFamilyIds.add(9); // Liberation Sans
+    }
+  }
+
+  // Build element map
+  const elementsById = new Map<string, ExcalidrawElement>();
+  for (const element of elements) {
+    elementsById.set(element.id, element);
+  }
+
+  // Build arrow → bound text lookup for masking
+  const arrowBoundTexts = new Map<string, ExcalidrawElement[]>();
+  for (const element of elements) {
+    const containerId = element.containerId as string | null;
+    if (element.type === "text" && containerId) {
+      const container = elementsById.get(containerId);
+      if (container && container.type === "arrow") {
+        const existing = arrowBoundTexts.get(containerId) || [];
+        existing.push(element);
+        arrowBoundTexts.set(containerId, existing);
+      }
+    }
+  }
+
+  // Generate mask defs for arrows with bound text labels
+  let defs = "";
+  const arrowMaskIds = new Map<string, string>();
+  for (const [arrowId, textElements] of arrowBoundTexts) {
+    const maskId = `mask-${arrowId}`;
+    arrowMaskIds.set(arrowId, maskId);
+    const padding = 4;
+    defs += `<mask id="${maskId}">\n`;
+    defs += `<rect x="0" y="0" width="${viewW}" height="${viewH}" fill="#fff"/>\n`;
+    for (const textEl of textElements) {
+      const tx = textEl.x + ox - padding;
+      const ty = textEl.y + oy - padding;
+      const tw = (textEl.width || 0) + padding * 2;
+      const th = (textEl.height || 0) + padding * 2;
+      defs += `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" fill="#000"/>\n`;
+    }
+    defs += `</mask>\n`;
+  }
+
+  // Generate @font-face CSS for used fonts
+  const fontCSS = generateFontFaceCSS(usedFontFamilyIds);
+  if (fontCSS) {
+    defs += `<style>\n  ${fontCSS}</style>\n`;
+  }
+
+  if (defs) {
+    svg += `<defs>\n${defs}</defs>\n`;
+  }
+
+  // Render elements (no frame clipping for diff export)
+  for (const element of elements) {
+    const maskId = arrowMaskIds.get(element.id);
+    svg += renderSvgElement(
+      gen,
+      element,
+      ox,
+      oy,
+      options.ct,
+      options.files,
+      options.darkMode,
+      maskId,
+    );
+  }
+
+  // Call afterRenderSvg callback if provided (e.g., for diff tags)
+  if (options.afterRenderSvg) {
+    svg += options.afterRenderSvg(ox, oy);
+  }
+
+  svg += `</svg>\n`;
+
+  writeFileSync(options.outputPath, svg, "utf-8");
 }

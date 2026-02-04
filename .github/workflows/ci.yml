@@ -43,9 +43,22 @@ jobs:
 
       - run: bun run lint
 
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install
+
+      - run: bun run test:unit
+
   docker-build:
     runs-on: ubuntu-latest
-    needs: [typecheck, lint]
+    needs: [typecheck, lint, unit-tests]
     steps:
       - uses: actions/checkout@v4
 
@@ -68,7 +81,7 @@ jobs:
 
   visual-tests:
     runs-on: ubuntu-latest
-    needs: [typecheck, lint]
+    needs: [typecheck, lint, unit-tests]
     steps:
       - uses: actions/checkout@v4
 
