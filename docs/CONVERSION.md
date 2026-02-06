@@ -22,6 +22,32 @@ Examples:
 - `excalirender diagram.excalidraw -o output` → PNG output (default)
 - `excalirender diagram.excalidraw` → `diagram.png` (default)
 
+## Piping (stdin/stdout)
+
+excalirender supports Unix-style piping for composability with other CLI tools.
+
+**stdin input**: Use `-` as the input path to read `.excalidraw` JSON from stdin:
+```bash
+cat diagram.excalidraw | excalirender - -o output.png
+curl -s https://example.com/diagram.excalidraw | excalirender - -o output.svg
+```
+
+**stdout output**: Use `-o -` to write the rendered image to stdout:
+```bash
+excalirender diagram.excalidraw -o - > output.png
+excalirender diagram.excalidraw -o - --format svg > output.svg
+```
+
+**Full pipe**: Combine both for end-to-end piping:
+```bash
+cat diagram.excalidraw | excalirender - -o - > output.png
+cat diagram.excalidraw | excalirender - -o - --format svg | other-tool
+```
+
+When writing to stdout, the `--format` flag specifies the output format (`png` or `svg`), defaulting to `png`. Status messages are redirected to stderr so they don't corrupt the binary output.
+
+Piping is not compatible with recursive mode (`-r`). For diff, only one of old/new can be stdin.
+
 ## Fonts
 
 Font files are sourced from `excalidraw/packages/excalidraw/fonts/` in WOFF2 format. They are converted to TTF using `scripts/convert-fonts.ts`, which uses the `wawoff2` library to decompress WOFF2 → TTF. The resulting TTF files live in `assets/fonts/`.

@@ -393,12 +393,13 @@ export interface PreparedExport {
 export function prepareExport(
   inputPath: string,
   options: ExportOptions,
+  content?: string,
 ): PreparedExport {
-  const content = readFileSync(inputPath, "utf-8");
+  const fileContent = content ?? readFileSync(inputPath, "utf-8");
   let data: ExcalidrawFile;
 
   try {
-    data = JSON.parse(content);
+    data = JSON.parse(fileContent);
   } catch (error) {
     throw new Error(`Failed to parse ${inputPath}: ${error}`);
   }

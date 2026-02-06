@@ -111,8 +111,10 @@ export async function exportDiffToPng(
   newPath: string,
   options: DiffOptions,
   format: "png" | "pdf" = "png",
+  oldContent?: string,
+  newContent?: string,
 ): Promise<void> {
-  const diff = computeDiff(oldPath, newPath);
+  const diff = computeDiff(oldPath, newPath, oldContent, newContent);
 
   // Unchanged elements are dimmed for context; diff elements keep original colors
   const styledUnchanged = options.hideUnchanged
@@ -187,8 +189,9 @@ export async function exportDiffToPng(
       : undefined,
   });
 
-  console.log(`Exported diff to ${options.outputPath}`);
-  console.log(
+  const log = options.outputPath === "-" ? console.error : console.log;
+  log(`Exported diff to ${options.outputPath}`);
+  log(
     `  Added: ${diff.added.length}, Removed: ${diff.removed.length}, Modified: ${diff.modified.length}, Unchanged: ${diff.unchanged.length}`,
   );
 }
@@ -200,8 +203,10 @@ export async function exportDiffToSvg(
   oldPath: string,
   newPath: string,
   options: DiffOptions,
+  oldContent?: string,
+  newContent?: string,
 ): Promise<void> {
-  const diff = computeDiff(oldPath, newPath);
+  const diff = computeDiff(oldPath, newPath, oldContent, newContent);
 
   // Unchanged elements are dimmed for context; diff elements keep original colors
   const styledUnchanged = options.hideUnchanged
@@ -279,8 +284,9 @@ export async function exportDiffToSvg(
       : undefined,
   });
 
-  console.log(`Exported diff to ${options.outputPath}`);
-  console.log(
+  const svgLog = options.outputPath === "-" ? console.error : console.log;
+  svgLog(`Exported diff to ${options.outputPath}`);
+  svgLog(
     `  Added: ${diff.added.length}, Removed: ${diff.removed.length}, Modified: ${diff.modified.length}, Unchanged: ${diff.unchanged.length}`,
   );
 }

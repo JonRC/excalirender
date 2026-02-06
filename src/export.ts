@@ -730,12 +730,13 @@ function renderElement(
 export async function exportToPng(
   inputPath: string,
   options: ExportOptions,
+  content?: string,
   format: "png" | "pdf" = "png",
 ): Promise<void> {
   // Register fonts first
   registerFonts();
 
-  const prepared = prepareExport(inputPath, options);
+  const prepared = prepareExport(inputPath, options, content);
   const {
     data,
     exportFrame,
@@ -851,9 +852,23 @@ export async function exportToPng(
 
   // Write output
   if (format === "pdf") {
-    writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
-    console.log(`Exported to ${options.outputPath}`);
+    if (options.outputPath === "-") {
+      process.stdout.write(canvas.toBuffer("application/pdf"));
+    } else {
+      writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+      console.log(`Exported to ${options.outputPath}`);
+    }
     return;
+  }
+
+  if (options.outputPath === "-") {
+    // Write PNG to stdout
+    return new Promise((resolve, reject) => {
+      const stream = canvas.createPNGStream();
+      stream.pipe(process.stdout);
+      stream.on("end", resolve);
+      stream.on("error", reject);
+    });
   }
 
   return new Promise((resolve, reject) => {
@@ -978,8 +993,22 @@ export async function exportToPngWithElements(
 
   // Write output
   if (format === "pdf") {
-    writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+    if (options.outputPath === "-") {
+      process.stdout.write(canvas.toBuffer("application/pdf"));
+    } else {
+      writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+    }
     return;
+  }
+
+  if (options.outputPath === "-") {
+    // Write PNG to stdout
+    return new Promise((resolve, reject) => {
+      const stream = canvas.createPNGStream();
+      stream.pipe(process.stdout);
+      stream.on("end", resolve);
+      stream.on("error", reject);
+    });
   }
 
   return new Promise((resolve, reject) => {

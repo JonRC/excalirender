@@ -63,12 +63,15 @@ function elementsAreEqual(a: ExcalidrawElement, b: ExcalidrawElement): boolean {
 /**
  * Load and parse an Excalidraw file.
  */
-export function loadExcalidrawFile(path: string): ExcalidrawFile {
-  const content = readFileSync(path, "utf-8");
+export function loadExcalidrawFile(
+  path: string,
+  content?: string,
+): ExcalidrawFile {
+  const fileContent = content ?? readFileSync(path, "utf-8");
   let data: ExcalidrawFile;
 
   try {
-    data = JSON.parse(content);
+    data = JSON.parse(fileContent);
   } catch (error) {
     throw new Error(`Failed to parse ${path}: ${error}`);
   }
@@ -87,9 +90,14 @@ export function loadExcalidrawFile(path: string): ExcalidrawFile {
  * Elements are matched by their `id` field.
  * Modified elements are those with same ID but different visual properties.
  */
-export function computeDiff(oldPath: string, newPath: string): DiffResult {
-  const oldData = loadExcalidrawFile(oldPath);
-  const newData = loadExcalidrawFile(newPath);
+export function computeDiff(
+  oldPath: string,
+  newPath: string,
+  oldContent?: string,
+  newContent?: string,
+): DiffResult {
+  const oldData = loadExcalidrawFile(oldPath, oldContent);
+  const newData = loadExcalidrawFile(newPath, newContent);
 
   const oldElements = oldData.elements.filter((el) => !el.isDeleted);
   const newElements = newData.elements.filter((el) => !el.isDeleted);
