@@ -21,7 +21,13 @@ export interface DiffCLIArgs {
   options: DiffOptions;
 }
 
-export type CLIArgs = ExportCLIArgs | DiffCLIArgs;
+export interface InfoCLIArgs {
+  command: "info";
+  inputPath: string;
+  json: boolean;
+}
+
+export type CLIArgs = ExportCLIArgs | DiffCLIArgs | InfoCLIArgs;
 
 /**
  * Generate default output filename for diff command.
@@ -156,14 +162,41 @@ function parseExportArgs(): ExportCLIArgs {
   };
 }
 
+function parseInfoArgs(): InfoCLIArgs {
+  const program = new Command();
+
+  program
+    .name("excalirender info")
+    .description("Show metadata about an .excalidraw file")
+    .argument("<input>", "Input .excalidraw file (or - for stdin)")
+    .option("--json", "Output metadata as JSON", false)
+    .parse(process.argv.slice(1)); // Skip 'info' from argv
+
+  const args = program.args;
+  const opts = program.opts();
+
+  if (args.length === 0) {
+    console.error("Error: Input path is required");
+    process.exit(1);
+  }
+
+  return {
+    command: "info",
+    inputPath: args[0],
+    json: opts.json || false,
+  };
+}
+
 function showHelp(): void {
   console.log(`Usage: excalirender [options] <input>
        excalirender diff [options] <old> <new>
+       excalirender info [options] <input>
 
 Convert .excalidraw files to PNG, SVG, or PDF
 
 Commands:
   diff <old> <new>            Create a visual diff between two .excalidraw files
+  info <input>                Show metadata about an .excalidraw file
 
 Arguments:
   input                       Input .excalidraw file or directory (with -r)
@@ -181,7 +214,8 @@ Options:
   --format <type>             Output format when using stdout (-o -): png, svg
   -h, --help                  display help for command
 
-Run 'excalirender diff --help' for diff command options.`);
+Run 'excalirender diff --help' for diff command options.
+Run 'excalirender info --help' for info command options.`);
 }
 
 export function parseArgs(): CLIArgs {
@@ -192,6 +226,10 @@ export function parseArgs(): CLIArgs {
 
   if (firstArg === "diff") {
     return parseDiffArgs();
+  }
+
+  if (firstArg === "info") {
+    return parseInfoArgs();
   }
 
   // Check for --help or -h without other args

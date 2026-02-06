@@ -129,6 +129,20 @@ excalirender diff old.excalidraw new.excalidraw --hide-unchanged
 
 See [docs/DIFF.md](docs/DIFF.md) for algorithm details and visual output documentation.
 
+### Info Command
+
+Display metadata about an `.excalidraw` file without rendering. Shows element counts by type, canvas dimensions, fonts, color palette, frames, and embedded files.
+
+```bash
+excalirender info diagram.excalidraw              # Human-readable output
+excalirender info diagram.excalidraw --json        # JSON output
+cat diagram.excalidraw | excalirender info -       # Read from stdin
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--json` | Output metadata as JSON | `false` |
+
 ## How It Works
 
 The rendering pipeline reads `.excalidraw` JSON files and draws elements to a server-side canvas using the same libraries Excalidraw uses:

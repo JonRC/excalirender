@@ -10,6 +10,7 @@ import {
 } from "./diff.js";
 import { exportToPng } from "./export.js";
 import { exportToSvg } from "./export-svg.js";
+import { runInfo } from "./info.js";
 import { findExcalidrawFiles } from "./scanner.js";
 import type { ExportOptions } from "./types.js";
 
@@ -138,7 +139,11 @@ async function main() {
   try {
     const args = parseArgs();
 
-    if (args.command === "diff") {
+    if (args.command === "info") {
+      const { inputPath, json } = args;
+      const content = inputPath === "-" ? readStdin() : undefined;
+      runInfo(inputPath, { json }, content);
+    } else if (args.command === "diff") {
       const { oldPath, newPath, format, options } = args;
 
       // Validate: both diff inputs cannot be stdin
