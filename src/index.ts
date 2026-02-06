@@ -48,6 +48,8 @@ async function convertFile(
   try {
     if (options.outputPath.endsWith(".svg")) {
       await exportToSvg(inputFile, options);
+    } else if (options.outputPath.endsWith(".pdf")) {
+      await exportToPng(inputFile, options, "pdf");
     } else {
       await exportToPng(inputFile, options);
     }
@@ -77,7 +79,9 @@ async function processRecursive(
   // Determine output extension from baseOptions or default to .png
   const outputExtension = baseOptions.outputPath.endsWith(".svg")
     ? ".svg"
-    : ".png";
+    : baseOptions.outputPath.endsWith(".pdf")
+      ? ".pdf"
+      : ".png";
 
   const results: ConversionResult[] = [];
   const total = files.length;
@@ -133,6 +137,8 @@ async function main() {
         await exportDiffToExcalidraw(oldPath, newPath, options);
       } else if (options.outputPath.endsWith(".svg")) {
         await exportDiffToSvg(oldPath, newPath, options);
+      } else if (options.outputPath.endsWith(".pdf")) {
+        await exportDiffToPng(oldPath, newPath, options, "pdf");
       } else {
         await exportDiffToPng(oldPath, newPath, options);
       }
@@ -144,6 +150,8 @@ async function main() {
       } else {
         if (options.outputPath.endsWith(".svg")) {
           await exportToSvg(inputPath, options);
+        } else if (options.outputPath.endsWith(".pdf")) {
+          await exportToPng(inputPath, options, "pdf");
         } else {
           await exportToPng(inputPath, options);
         }

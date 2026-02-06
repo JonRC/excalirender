@@ -1,6 +1,6 @@
 # excalirender
 
-CLI tool that converts [Excalidraw](https://excalidraw.com) `.excalidraw` files to PNG and SVG images. Runs as a standalone binary compiled with [Bun](https://bun.sh), available as a Docker image or a self-contained native Linux binary.
+CLI tool that converts [Excalidraw](https://excalidraw.com) `.excalidraw` files to PNG, SVG, and PDF. Runs as a standalone binary compiled with [Bun](https://bun.sh), available as a Docker image or a self-contained native Linux binary.
 
 ## Get Started
 
@@ -43,7 +43,7 @@ excalirender <input> [options]
 | Flag | Description | Default |
 |------|-------------|---------|
 | `-r, --recursive` | Convert all .excalidraw files in directory | `false` |
-| `-o, --output <path>` | Output file path (.png or .svg); format inferred from extension | `<input>.png` |
+| `-o, --output <path>` | Output file path (.png, .svg, or .pdf); format inferred from extension | `<input>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-b, --background <color>` | Background color (hex) | From file or `#ffffff` |
 | `-d, --dark` | Enable dark mode export | `false` |
@@ -58,6 +58,7 @@ excalirender drawing.excalidraw --dark             # Dark mode
 excalirender drawing.excalidraw -b "#f0f0f0"       # Custom background
 excalirender drawing.excalidraw --transparent       # Transparent background
 excalirender drawing.excalidraw -o out.svg         # SVG output
+excalirender drawing.excalidraw -o out.pdf         # PDF output (vector)
 ```
 
 ### Recursive Conversion
@@ -82,7 +83,7 @@ excalirender diff old.excalidraw new.excalidraw
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `-o, --output <path>` | Output file (.png, .svg, or .excalidraw) | `<old>_vs_<new>.png` |
+| `-o, --output <path>` | Output file (.png, .svg, .pdf, or .excalidraw) | `<old>_vs_<new>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-d, --dark` | Enable dark mode export | `false` |
 | `--transparent` | Transparent background (no fill) | `false` |
@@ -94,6 +95,7 @@ Examples:
 ```bash
 excalirender diff v1.excalidraw v2.excalidraw                # Creates v1_vs_v2.png
 excalirender diff old.excalidraw new.excalidraw -o diff.svg  # SVG output
+excalirender diff old.excalidraw new.excalidraw -o diff.pdf  # PDF output
 excalirender diff old.excalidraw new.excalidraw --dark       # Dark mode
 excalirender diff old.excalidraw new.excalidraw --transparent    # Transparent background
 excalirender diff old.excalidraw new.excalidraw --hide-unchanged

@@ -1,4 +1,4 @@
-import { createWriteStream } from "node:fs";
+import { createWriteStream, writeFileSync } from "node:fs";
 import {
   type CanvasRenderingContext2D,
   createCanvas,
@@ -730,6 +730,7 @@ function renderElement(
 export async function exportToPng(
   inputPath: string,
   options: ExportOptions,
+  format: "png" | "pdf" = "png",
 ): Promise<void> {
   // Register fonts first
   registerFonts();
@@ -747,9 +748,17 @@ export async function exportToPng(
     elementsById,
   } = prepared;
 
-  // Create canvas
-  const canvas = createCanvas(width, height);
+  // Create canvas (PDF backend for pdf format)
+  const canvas =
+    format === "pdf"
+      ? createCanvas(width, height, "pdf")
+      : createCanvas(width, height);
   const ctx = canvas.getContext("2d");
+
+  // Enable font embedding for selectable text in PDF
+  if (format === "pdf") {
+    (ctx as any).textDrawingMode = "glyph";
+  }
 
   // Apply scale
   ctx.scale(options.scale, options.scale);
@@ -840,7 +849,13 @@ export async function exportToPng(
     }
   }
 
-  // Write PNG to file
+  // Write output
+  if (format === "pdf") {
+    writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+    console.log(`Exported to ${options.outputPath}`);
+    return;
+  }
+
   return new Promise((resolve, reject) => {
     const out = createWriteStream(options.outputPath);
     const stream = canvas.createPNGStream();
@@ -867,6 +882,7 @@ export interface RenderOptions {
   ct: ColorTransform;
   darkMode: boolean;
   files: Record<string, { dataURL: string }>;
+  format?: "png" | "pdf";
   /** Optional callback to render additional content after elements (e.g., diff tags) */
   afterRender?: (
     ctx: CanvasRenderingContext2D,
@@ -886,9 +902,19 @@ export async function exportToPngWithElements(
   // Register fonts first
   registerFonts();
 
-  // Create canvas
-  const canvas = createCanvas(options.width, options.height);
+  const format = options.format || "png";
+
+  // Create canvas (PDF backend for pdf format)
+  const canvas =
+    format === "pdf"
+      ? createCanvas(options.width, options.height, "pdf")
+      : createCanvas(options.width, options.height);
   const ctx = canvas.getContext("2d");
+
+  // Enable font embedding for selectable text in PDF
+  if (format === "pdf") {
+    (ctx as any).textDrawingMode = "glyph";
+  }
 
   // Apply scale
   ctx.scale(options.scale, options.scale);
@@ -950,7 +976,12 @@ export async function exportToPngWithElements(
     options.afterRender(ctx, offsetX, offsetY);
   }
 
-  // Write PNG to file
+  // Write output
+  if (format === "pdf") {
+    writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+    return;
+  }
+
   return new Promise((resolve, reject) => {
     const out = createWriteStream(options.outputPath);
     const stream = canvas.createPNGStream();

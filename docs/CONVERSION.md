@@ -1,4 +1,4 @@
-# Conversion: .excalidraw to PNG/SVG
+# Conversion: .excalidraw to PNG/SVG/PDF
 
 ## Origin
 
@@ -12,11 +12,13 @@ The output format is determined by the `-o`/`--output` file extension:
 |-----------|--------|-------|
 | `.svg` | SVG | Vector format, scalable |
 | `.png` | PNG | Raster format (default) |
+| `.pdf` | PDF | Vector format via Cairo PDF backend |
 | (none) | PNG | Default when no extension specified |
 
 Examples:
 - `excalirender diagram.excalidraw -o output.svg` → SVG output
 - `excalirender diagram.excalidraw -o output.png` → PNG output
+- `excalirender diagram.excalidraw -o output.pdf` → PDF output
 - `excalirender diagram.excalidraw -o output` → PNG output (default)
 - `excalirender diagram.excalidraw` → `diagram.png` (default)
 

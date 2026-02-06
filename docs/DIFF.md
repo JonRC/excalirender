@@ -10,7 +10,7 @@ The `excalirender diff` command compares two Excalidraw files and generates a vi
 - **Modified** elements (same ID, different properties)
 - **Unchanged** elements (dimmed for context)
 
-Output formats: PNG, SVG, and Excalidraw (`.excalidraw`).
+Output formats: PNG, SVG, PDF, and Excalidraw (`.excalidraw`).
 
 ## Usage
 
@@ -62,6 +62,7 @@ Format is determined by file extension:
 |-----------|--------|-------------|
 | `.png` | PNG image | Default format |
 | `.svg` | SVG image | Vector format |
+| `.pdf` | PDF document | Vector format via Cairo |
 | `.excalidraw` | Excalidraw file | Editable in Excalidraw |
 
 ## Algorithm
@@ -178,7 +179,7 @@ interface DiffOptions {
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-o, --output <path>` | Output file path (.png, .svg, or .excalidraw) | `<old>_vs_<new>.png` |
+| `-o, --output <path>` | Output file path (.png, .svg, .pdf, or .excalidraw) | `<old>_vs_<new>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-d, --dark` | Enable dark mode export | `false` |
 | `--transparent` | Transparent background (no fill) | `false` |
