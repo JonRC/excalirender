@@ -10,7 +10,7 @@ The `excalirender diff` command compares two Excalidraw files and generates a vi
 - **Modified** elements (same ID, different properties)
 - **Unchanged** elements (dimmed for context)
 
-Output formats: PNG, SVG, PDF, and Excalidraw (`.excalidraw`).
+Output formats: PNG, SVG, PDF, GIF (animated), and Excalidraw (`.excalidraw`).
 
 ## Usage
 
@@ -41,6 +41,12 @@ excalirender diff old.excalidraw new.excalidraw --dark
 
 # Transparent background
 excalirender diff old.excalidraw new.excalidraw --transparent
+
+# Animated GIF (alternates between old and new states)
+excalirender diff old.excalidraw new.excalidraw -o diff.gif
+
+# GIF with custom frame delay (2 seconds)
+excalirender diff old.excalidraw new.excalidraw -o diff.gif --delay 2000
 ```
 
 ### Output Naming
@@ -63,6 +69,7 @@ Format is determined by file extension:
 | `.png` | PNG image | Default format |
 | `.svg` | SVG image | Vector format |
 | `.pdf` | PDF document | Vector format via Cairo |
+| `.gif` | Animated GIF | Alternates between old and new states |
 | `.excalidraw` | Excalidraw file | Editable in Excalidraw |
 
 ## Algorithm
@@ -138,9 +145,11 @@ This ensures added elements appear on top for visibility.
 ### File Structure
 
 ```
-src/diff-core.ts  # Core algorithm (computeDiff, element comparison)
-src/diff.ts       # Rendering (PNG/SVG export, tag rendering)
-src/cli.ts        # CLI argument parsing for diff subcommand
+src/diff-core.ts       # Core algorithm (computeDiff, element comparison)
+src/diff.ts            # Rendering (PNG/SVG export, tag rendering)
+src/diff-gif.ts        # Animated GIF export (old/new state frames)
+src/diff-excalidraw.ts # Excalidraw format export, DiffOptions interface
+src/cli.ts             # CLI argument parsing for diff subcommand
 ```
 
 ### Key Functions
@@ -151,7 +160,8 @@ src/cli.ts        # CLI argument parsing for diff subcommand
 | `elementsAreEqual(a, b)` | diff-core.ts | Compares visual properties |
 | `exportDiffToPng()` | diff.ts | Renders diff to PNG |
 | `exportDiffToSvg()` | diff.ts | Renders diff to SVG |
-| `exportDiffToExcalidraw()` | diff.ts | Exports diff as Excalidraw file |
+| `exportDiffToGif()` | diff-gif.ts | Renders animated GIF (old/new frames) |
+| `exportDiffToExcalidraw()` | diff-excalidraw.ts | Exports diff as Excalidraw file |
 | `renderDiffTag()` | diff.ts | Renders PNG status tag |
 | `createSvgTag()` | diff.ts | Generates SVG status tag |
 
@@ -172,6 +182,7 @@ interface DiffOptions {
   showTags: boolean;
   darkMode: boolean;
   transparent: boolean;
+  gifDelay?: number;
 }
 ```
 
@@ -179,9 +190,33 @@ interface DiffOptions {
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-o, --output <path>` | Output file path (.png, .svg, .pdf, or .excalidraw) | `<old>_vs_<new>.png` |
+| `-o, --output <path>` | Output file path (.png, .svg, .pdf, .gif, or .excalidraw) | `<old>_vs_<new>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-d, --dark` | Enable dark mode export | `false` |
 | `--transparent` | Transparent background (no fill) | `false` |
 | `--hide-unchanged` | Don't render unchanged elements | `false` |
 | `--no-tags` | Don't render status tags | `false` |
+| `--delay <ms>` | GIF frame delay in milliseconds | `1000` |
+
+## Animated GIF Output
+
+The `.gif` format produces an animated GIF that alternates between the old and new states of the diagram, providing a visual "before/after" comparison.
+
+### How It Works
+
+- **Frame 1**: Shows the old state (unchanged + removed + old version of modified elements)
+- **Frame 2**: Shows the new state (unchanged + added + new version of modified elements)
+- The GIF loops infinitely, alternating between frames at the configured delay
+
+The `--delay` option controls the time (in milliseconds) each frame is displayed. Default is 1000ms (1 second).
+
+### GIF-Specific Behavior
+
+- `--no-tags` is ignored for GIF output (tags are not rendered since each frame shows a complete state, not a diff overlay)
+- `--hide-unchanged` removes unchanged elements from both frames
+- `--dark`, `--transparent`, and `--scale` apply to both frames
+
+### Limitations
+
+- **256-color palette**: GIF supports a maximum of 256 colors per frame. This is sufficient for typical Excalidraw diagrams (which use fewer than 20 colors), but complex diagrams with many colors may show slight quantization artifacts.
+- **1-bit transparency**: GIF transparency is binary (fully transparent or fully opaque). The `--transparent` flag works, but elements with partial opacity may render differently compared to PNG output.
