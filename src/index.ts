@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { readFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 import { parseArgs } from "./cli.js";
 import {
@@ -11,6 +12,13 @@ import { exportToPng } from "./export.js";
 import { exportToSvg } from "./export-svg.js";
 import { findExcalidrawFiles } from "./scanner.js";
 import type { ExportOptions } from "./types.js";
+
+/**
+ * Read content from stdin (synchronous).
+ */
+function readStdin(): string {
+  return readFileSync("/dev/stdin", "utf-8");
+}
 
 interface ConversionResult {
   file: string;
@@ -49,7 +57,7 @@ async function convertFile(
     if (options.outputPath.endsWith(".svg")) {
       await exportToSvg(inputFile, options);
     } else if (options.outputPath.endsWith(".pdf")) {
-      await exportToPng(inputFile, options, "pdf");
+      await exportToPng(inputFile, options, undefined, "pdf");
     } else {
       await exportToPng(inputFile, options);
     }
@@ -131,30 +139,103 @@ async function main() {
     const args = parseArgs();
 
     if (args.command === "diff") {
-      const { oldPath, newPath, options } = args;
+      const { oldPath, newPath, format, options } = args;
 
-      if (options.outputPath.endsWith(".excalidraw")) {
-        await exportDiffToExcalidraw(oldPath, newPath, options);
-      } else if (options.outputPath.endsWith(".svg")) {
-        await exportDiffToSvg(oldPath, newPath, options);
-      } else if (options.outputPath.endsWith(".pdf")) {
-        await exportDiffToPng(oldPath, newPath, options, "pdf");
+      // Validate: both diff inputs cannot be stdin
+      if (oldPath === "-" && newPath === "-") {
+        console.error("Error: Only one diff input can be stdin (-)");
+        process.exit(1);
+      }
+
+      // Read stdin content for whichever input is "-"
+      const stdinContent =
+        oldPath === "-" || newPath === "-" ? readStdin() : undefined;
+      const oldContent = oldPath === "-" ? stdinContent : undefined;
+      const newContent = newPath === "-" ? stdinContent : undefined;
+
+      // Determine output format: use --format for stdout, or extension for files
+      const outputFormat =
+        options.outputPath === "-"
+          ? format || "png"
+          : options.outputPath.endsWith(".excalidraw")
+            ? "excalidraw"
+            : options.outputPath.endsWith(".svg")
+              ? "svg"
+              : options.outputPath.endsWith(".pdf")
+                ? "pdf"
+                : "png";
+
+      if (outputFormat === "excalidraw") {
+        await exportDiffToExcalidraw(
+          oldPath,
+          newPath,
+          options,
+          oldContent,
+          newContent,
+        );
+      } else if (outputFormat === "svg") {
+        await exportDiffToSvg(
+          oldPath,
+          newPath,
+          options,
+          oldContent,
+          newContent,
+        );
+      } else if (outputFormat === "pdf") {
+        await exportDiffToPng(
+          oldPath,
+          newPath,
+          options,
+          "pdf",
+          oldContent,
+          newContent,
+        );
       } else {
-        await exportDiffToPng(oldPath, newPath, options);
+        await exportDiffToPng(
+          oldPath,
+          newPath,
+          options,
+          "png",
+          oldContent,
+          newContent,
+        );
       }
     } else {
-      const { inputPath, recursive, outputDir, options } = args;
+      const { inputPath, recursive, outputDir, format, options } = args;
+
+      // Validate: stdin incompatible with recursive mode
+      if (inputPath === "-" && recursive) {
+        console.error("Error: Cannot read from stdin in recursive mode");
+        process.exit(1);
+      }
+
+      // Validate: stdout incompatible with recursive mode
+      if ((options.outputPath === "-" || outputDir === "-") && recursive) {
+        console.error("Error: Cannot write to stdout in recursive mode");
+        process.exit(1);
+      }
+
+      // Read stdin content if input is "-"
+      const content = inputPath === "-" ? readStdin() : undefined;
+
+      // Determine output format: use --format for stdout, or extension for files
+      const outputFormat =
+        options.outputPath === "-"
+          ? format || "png"
+          : options.outputPath.endsWith(".svg")
+            ? "svg"
+            : options.outputPath.endsWith(".pdf")
+              ? "pdf"
+              : "png";
 
       if (recursive) {
         await processRecursive(inputPath, outputDir, options);
+      } else if (outputFormat === "svg") {
+        await exportToSvg(inputPath, options, content);
+      } else if (outputFormat === "pdf") {
+        await exportToPng(inputPath, options, content, "pdf");
       } else {
-        if (options.outputPath.endsWith(".svg")) {
-          await exportToSvg(inputPath, options);
-        } else if (options.outputPath.endsWith(".pdf")) {
-          await exportToPng(inputPath, options, "pdf");
-        } else {
-          await exportToPng(inputPath, options);
-        }
+        await exportToPng(inputPath, options, content);
       }
     }
   } catch (error) {

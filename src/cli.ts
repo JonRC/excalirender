@@ -9,6 +9,7 @@ export interface ExportCLIArgs {
   inputPath: string;
   recursive: boolean;
   outputDir: string | null;
+  format: string | undefined;
   options: ExportOptions;
 }
 
@@ -16,6 +17,7 @@ export interface DiffCLIArgs {
   command: "diff";
   oldPath: string;
   newPath: string;
+  format: string | undefined;
   options: DiffOptions;
 }
 
@@ -50,6 +52,10 @@ function parseDiffArgs(): DiffCLIArgs {
     .option("--transparent", "Transparent background (no fill)", false)
     .option("--hide-unchanged", "Don't render unchanged elements", false)
     .option("--no-tags", "Don't render status tags below elements")
+    .option(
+      "--format <type>",
+      "Output format when using stdout (-o -): png, svg",
+    )
     .parse(process.argv.slice(1)); // Skip 'diff' from argv
 
   const args = program.args;
@@ -67,6 +73,7 @@ function parseDiffArgs(): DiffCLIArgs {
     command: "diff",
     oldPath: args[0],
     newPath: args[1],
+    format: opts.format || undefined,
     options: {
       outputPath,
       scale: parseFloat(opts.scale) || 1,
@@ -103,6 +110,10 @@ function parseExportArgs(): ExportCLIArgs {
       "-f, --frame <name>",
       "Export only the specified frame (by name or ID)",
     )
+    .option(
+      "--format <type>",
+      "Output format when using stdout (-o -): png, svg",
+    )
     .parse();
 
   const args = program.args;
@@ -134,6 +145,7 @@ function parseExportArgs(): ExportCLIArgs {
     inputPath,
     recursive,
     outputDir,
+    format: opts.format || undefined,
     options: {
       outputPath,
       scale: parseFloat(opts.scale) || 1,
@@ -166,6 +178,7 @@ Options:
   -d, --dark                  Enable dark mode export (default: false)
   --transparent               Transparent background (no fill) (default: false)
   -f, --frame <name>          Export only the specified frame (by name or ID)
+  --format <type>             Output format when using stdout (-o -): png, svg
   -h, --help                  display help for command
 
 Run 'excalirender diff --help' for diff command options.`);

@@ -20,7 +20,8 @@
     "test:native": "bun run tests/native/run.ts",
     "test:recursive": "bun run tests/recursive/run.ts",
     "test:unit": "bun run tests/recursive/run.ts --unit-only",
-    "test:diff": "bun run tests/diff/run.ts"
+    "test:diff": "bun run tests/diff/run.ts",
+    "test:stdin-stdout": "bun run tests/stdin-stdout/run.ts"
   },
   "keywords": ["excalidraw", "cli", "png", "export"],
   "author": "",

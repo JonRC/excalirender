@@ -48,6 +48,7 @@ excalirender <input> [options]
 | `-b, --background <color>` | Background color (hex) | From file or `#ffffff` |
 | `-d, --dark` | Enable dark mode export | `false` |
 | `--transparent` | Transparent background (no fill) | `false` |
+| `--format <type>` | Output format when using stdout (`-o -`): `png`, `svg` | `png` |
 
 ### Examples
 
@@ -73,6 +74,30 @@ excalirender -r ./diagrams --dark -s 2  # With options
 
 For Docker, prefix commands with `docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender`.
 
+### Piping (stdin/stdout)
+
+Use `-` as input to read from stdin, and `-o -` to write to stdout. This enables composability with other CLI tools.
+
+```bash
+# Read from stdin
+cat diagram.excalidraw | excalirender - -o output.png
+excalirender - -o output.svg < diagram.excalidraw
+
+# Write to stdout
+excalirender diagram.excalidraw -o - > output.png
+excalirender diagram.excalidraw -o - --format svg > output.svg
+
+# Full pipe (stdin + stdout)
+cat diagram.excalidraw | excalirender - -o - > output.png
+cat diagram.excalidraw | excalirender - -o - --format svg | other-tool
+
+# Diff with stdin (one file only)
+cat old.excalidraw | excalirender diff - new.excalidraw -o diff.png
+excalirender diff old.excalidraw - -o - < new.excalidraw > diff.png
+```
+
+When writing to stdout (`-o -`), use `--format` to specify the output format (`png` or `svg`). Defaults to `png`. Status messages are redirected to stderr so they don't corrupt the binary output.
+
 ### Diff Command
 
 Compare two Excalidraw files and generate a visual diff highlighting added, removed, and modified elements:
@@ -89,6 +114,7 @@ excalirender diff old.excalidraw new.excalidraw
 | `--transparent` | Transparent background (no fill) | `false` |
 | `--hide-unchanged` | Don't render unchanged elements | `false` |
 | `--no-tags` | Don't render status tags | `false` |
+| `--format <type>` | Output format when using stdout (`-o -`): `png`, `svg` | `png` |
 
 Examples:
 

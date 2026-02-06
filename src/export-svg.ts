@@ -544,8 +544,9 @@ function renderSvgElement(
 export async function exportToSvg(
   inputPath: string,
   options: ExportOptions,
+  content?: string,
 ): Promise<void> {
-  const prepared = prepareExport(inputPath, options);
+  const prepared = prepareExport(inputPath, options, content);
   const {
     data,
     exportFrame,
@@ -728,8 +729,12 @@ export async function exportToSvg(
 
   svg += `</svg>\n`;
 
-  writeFileSync(options.outputPath, svg, "utf-8");
-  console.log(`Exported to ${options.outputPath}`);
+  if (options.outputPath === "-") {
+    process.stdout.write(svg);
+  } else {
+    writeFileSync(options.outputPath, svg, "utf-8");
+    console.log(`Exported to ${options.outputPath}`);
+  }
 }
 
 /**
@@ -859,5 +864,9 @@ export async function exportToSvgWithElements(
 
   svg += `</svg>\n`;
 
-  writeFileSync(options.outputPath, svg, "utf-8");
+  if (options.outputPath === "-") {
+    process.stdout.write(svg);
+  } else {
+    writeFileSync(options.outputPath, svg, "utf-8");
+  }
 }
