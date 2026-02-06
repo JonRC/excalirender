@@ -9,7 +9,7 @@ import {
   exportDiffToSvg,
 } from "./diff.js";
 import { exportToPng } from "./export.js";
-import { exportToSvg } from "./export-svg.js";
+import { exportToSvg } from "./export-svg/index.js";
 import { runInfo } from "./info.js";
 import { findExcalidrawFiles } from "./scanner.js";
 import type { ExportOptions } from "./types.js";

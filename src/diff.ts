@@ -11,7 +11,7 @@ import {
   TAG_COLORS,
 } from "./diff-excalidraw.js";
 import { exportToPngWithElements } from "./export.js";
-import { exportToSvgWithElements } from "./export-svg.js";
+import { exportToSvgWithElements } from "./export-svg/index.js";
 import {
   applyDarkModeFilter,
   getCanvasBounds,
