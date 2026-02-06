@@ -12,7 +12,11 @@ import {
 } from "./diff-excalidraw.js";
 import { exportToPngWithElements } from "./export.js";
 import { exportToSvgWithElements } from "./export-svg.js";
-import { getCanvasBounds, identityColor } from "./shared.js";
+import {
+  applyDarkModeFilter,
+  getCanvasBounds,
+  identityColor,
+} from "./shared.js";
 import type { ExcalidrawElement } from "./types.js";
 
 // Re-export from diff-core for backwards compatibility
@@ -159,15 +163,18 @@ export async function exportDiffToPng(
   const width = Math.ceil((bounds.maxX - bounds.minX) * options.scale);
   const height = Math.ceil((bounds.maxY - bounds.minY) * options.scale);
 
+  const ct = options.darkMode ? applyDarkModeFilter : identityColor;
+  const backgroundColor = options.transparent ? "transparent" : ct("#ffffff");
+
   await exportToPngWithElements(allElements, {
     outputPath: options.outputPath,
     scale: options.scale,
     bounds,
     width,
     height,
-    backgroundColor: "#ffffff",
-    ct: identityColor,
-    darkMode: false,
+    backgroundColor,
+    ct,
+    darkMode: options.darkMode,
     files: {},
     afterRender: options.showTags
       ? (ctx, offsetX, offsetY) => {
@@ -244,15 +251,20 @@ export async function exportDiffToSvg(
   const width = Math.ceil((bounds.maxX - bounds.minX) * options.scale);
   const height = Math.ceil((bounds.maxY - bounds.minY) * options.scale);
 
+  const svgCt = options.darkMode ? applyDarkModeFilter : identityColor;
+  const svgBackgroundColor = options.transparent
+    ? "transparent"
+    : svgCt("#ffffff");
+
   await exportToSvgWithElements(allElements, {
     outputPath: options.outputPath,
     scale: options.scale,
     bounds,
     width,
     height,
-    backgroundColor: "#ffffff",
-    ct: identityColor,
-    darkMode: false,
+    backgroundColor: svgBackgroundColor,
+    ct: svgCt,
+    darkMode: options.darkMode,
     files: {},
     afterRenderSvg: options.showTags
       ? (offsetX, offsetY) => {

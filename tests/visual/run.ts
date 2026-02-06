@@ -146,6 +146,32 @@ function discoverTests(): TestCase[] {
       format: "svg",
       type: "diff",
     });
+
+    // Dark mode PNG diff test
+    tests.push({
+      name: "diff-test--dark",
+      fixture: diffBase,
+      diffNewFixture: diffModified,
+      outputName: "diff-test--dark.png",
+      baselineName: "diff-test--dark.png",
+      darkMode: true,
+      scale: 1,
+      format: "png",
+      type: "diff",
+    });
+
+    // Dark mode SVG diff test
+    tests.push({
+      name: "diff-test--dark--svg",
+      fixture: diffBase,
+      diffNewFixture: diffModified,
+      outputName: "diff-test--dark.svg",
+      baselineName: "diff-test--dark--svg.png",
+      darkMode: true,
+      scale: 1,
+      format: "svg",
+      type: "diff",
+    });
   }
 
   // Add diff-changed test (tests modified objects specifically)
@@ -250,6 +276,7 @@ async function runDiffCli(
   oldPath: string,
   newPath: string,
   outputPath: string,
+  options: { darkMode?: boolean } = {},
 ): Promise<{ success: boolean; stderr: string }> {
   // Convert paths to be relative to project root (Docker mounts project root as /data)
   const relOld = relative(PROJECT_ROOT, oldPath);
@@ -271,6 +298,7 @@ async function runDiffCli(
     "-o",
     relOutput,
   ];
+  if (options.darkMode) args.push("--dark");
 
   const proc = Bun.spawn(args, {
     cwd: PROJECT_ROOT,
@@ -461,7 +489,9 @@ async function main() {
     // Generate output via Docker
     let result: { success: boolean; stderr: string };
     if (test.type === "diff" && test.diffNewFixture) {
-      result = await runDiffCli(test.fixture, test.diffNewFixture, outputPath);
+      result = await runDiffCli(test.fixture, test.diffNewFixture, outputPath, {
+        darkMode: test.darkMode,
+      });
     } else {
       result = await runCli(test.fixture, outputPath, {
         darkMode: test.darkMode,

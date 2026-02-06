@@ -755,8 +755,10 @@ export async function exportToPng(
   ctx.scale(options.scale, options.scale);
 
   // Fill background
-  ctx.fillStyle = backgroundColor;
-  ctx.fillRect(0, 0, width / options.scale, height / options.scale);
+  if (backgroundColor !== "transparent") {
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, width / options.scale, height / options.scale);
+  }
 
   // Create rough canvas
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -892,13 +894,15 @@ export async function exportToPngWithElements(
   ctx.scale(options.scale, options.scale);
 
   // Fill background
-  ctx.fillStyle = options.backgroundColor;
-  ctx.fillRect(
-    0,
-    0,
-    options.width / options.scale,
-    options.height / options.scale,
-  );
+  if (options.backgroundColor !== "transparent") {
+    ctx.fillStyle = options.backgroundColor;
+    ctx.fillRect(
+      0,
+      0,
+      options.width / options.scale,
+      options.height / options.scale,
+    );
+  }
 
   // Create rough canvas
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
