@@ -35,11 +35,22 @@ export interface CombineCLIArgs {
   options: CombineOptions;
 }
 
+export interface WatchCLIArgs {
+  command: "watch";
+  inputPaths: string[];
+  mode: "export" | "diff";
+  port: number;
+  open: boolean;
+  exportOptions: ExportOptions;
+  diffOptions: DiffOptions;
+}
+
 export type CLIArgs =
   | ExportCLIArgs
   | DiffCLIArgs
   | InfoCLIArgs
-  | CombineCLIArgs;
+  | CombineCLIArgs
+  | WatchCLIArgs;
 
 /**
  * Generate default output filename for diff command.
@@ -153,6 +164,41 @@ function buildCombineArgs(
   };
 }
 
+function buildWatchArgs(
+  files: string[],
+  opts: Record<string, unknown>,
+): WatchCLIArgs {
+  const mode = files.length === 2 ? "diff" : "export";
+  const scale = Number.parseFloat(opts.scale as string) || 1;
+  const darkMode = (opts.dark as boolean) || false;
+  const transparent = (opts.transparent as boolean) || false;
+
+  return {
+    command: "watch",
+    inputPaths: files,
+    mode,
+    port: Number.parseInt(opts.port as string, 10),
+    open: opts.open !== false,
+    exportOptions: {
+      outputPath: "",
+      scale,
+      background: transparent
+        ? "transparent"
+        : (opts.background as string) || null,
+      darkMode,
+      frameId: (opts.frame as string) || undefined,
+    },
+    diffOptions: {
+      outputPath: "",
+      scale,
+      hideUnchanged: (opts.hideUnchanged as boolean) || false,
+      showTags: opts.tags !== false,
+      darkMode,
+      transparent,
+    },
+  };
+}
+
 export function parseArgs(): CLIArgs {
   let result: CLIArgs | null = null;
 
@@ -247,6 +293,29 @@ export function parseArgs(): CLIArgs {
     .option("--format <type>", "Output format when using stdout (-o -): png")
     .action((files: string[], opts: Record<string, unknown>) => {
       result = buildCombineArgs(files, opts);
+    });
+
+  program
+    .command("watch")
+    .description(
+      "Watch .excalidraw file(s) and preview in browser with live reload",
+    )
+    .argument("<files...>", "Input file(s): 1 file = export, 2 files = diff")
+    .option("-p, --port <number>", "HTTP server port", "3333")
+    .option("-s, --scale <number>", "Export scale factor", "1")
+    .option("-d, --dark", "Enable dark mode", false)
+    .option("--transparent", "Transparent background", false)
+    .option("-b, --background <color>", "Background color")
+    .option("-f, --frame <name>", "Export specific frame (export mode)")
+    .option("--no-open", "Don't auto-open browser")
+    .option(
+      "--hide-unchanged",
+      "Don't render unchanged elements (diff mode)",
+      false,
+    )
+    .option("--no-tags", "Don't render status tags (diff mode)")
+    .action((files: string[], opts: Record<string, unknown>) => {
+      result = buildWatchArgs(files, opts);
     });
 
   program.parse();

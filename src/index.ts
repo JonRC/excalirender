@@ -141,7 +141,26 @@ async function main() {
   try {
     const args = parseArgs();
 
-    if (args.command === "info") {
+    if (args.command === "watch") {
+      const { inputPaths } = args;
+
+      // Validate file count
+      if (inputPaths.length === 0 || inputPaths.length > 2) {
+        console.error(
+          "Error: Watch mode supports 1 file (export) or 2 files (diff)",
+        );
+        process.exit(1);
+      }
+
+      // Validate no stdin
+      if (inputPaths.some((p) => p === "-")) {
+        console.error("Error: Watch mode doesn't support stdin (-)");
+        process.exit(1);
+      }
+
+      const { startWatchServer } = await import("./watch.js");
+      await startWatchServer(args);
+    } else if (args.command === "info") {
       const { inputPath, json } = args;
       const content = inputPath === "-" ? readStdin() : undefined;
       runInfo(inputPath, { json }, content);
