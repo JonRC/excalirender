@@ -2,6 +2,10 @@
 
 Three location maps from Middle-earth in separate subdirectories, demonstrating recursive batch conversion with the `-r` flag.
 
+| The Shire | Gondor | Mordor |
+|:---------:|:------:|:------:|
+| ![Hobbiton](shire/hobbiton.png) | ![Minas Tirith](gondor/minas-tirith.png) | ![Mount Doom](mordor/mount-doom.png) |
+
 ## Directory Structure
 
 ```

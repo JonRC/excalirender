@@ -2,6 +2,8 @@
 
 A Zelda-themed item inventory diagram with diverse element types, multiple colors, two font families, and a frame — designed to produce rich metadata output.
 
+![Zelda Inventory](zelda-inventory.png)
+
 ## File
 
 - `zelda-inventory.excalidraw` — 22 elements: 8 item rectangles (Master Sword, Hylian Shield, Fairy Bow, Bombs, Hookshot, Boomerang, Megaton Hammer, Ocarina of Time), a Triforce ellipse, 2 section labels, 1 arrow, and a "Weapons" frame

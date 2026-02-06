@@ -2,6 +2,10 @@
 
 Two Pokemon evolution chain diagrams — fire (red) and water (blue) — designed for side-by-side comparison with the `combine` command.
 
+| Team Red | Team Blue |
+|:--------:|:---------:|
+| ![Team Red](team-red.png) | ![Team Blue](team-blue.png) |
+
 ## Files
 
 - `team-red.excalidraw` — Charmander → Charmeleon → Charizard (red/orange gradient)

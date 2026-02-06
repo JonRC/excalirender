@@ -2,6 +2,8 @@
 
 A side-scrolling Super Mario Bros level layout demonstrating all export formats and options.
 
+![Mario Level](mario-level.png)
+
 ## File
 
 - `mario-level.excalidraw` — World 1-1 level map with 5 stages (Start, Pipe Zone, Goomba Field, Bowser's Castle, Flag Pole), a "?" block, a coin, and a frame named "World 1-1"

@@ -4,13 +4,13 @@ Each folder demonstrates a command with a different game/series theme. Every `.e
 
 ## Examples
 
-| Example | Command | Theme | Formats | Key Options |
-|---------|---------|-------|---------|-------------|
-| [export/](export/) | `excalirender` | Super Mario Bros | PNG, SVG, PDF | `--dark` `--transparent` `--scale` `--frame` |
-| [diff-gif/](diff-gif/) | `excalirender diff` | Hollow Knight | PNG, SVG, PDF, GIF, .excalidraw | `--delay` `--hide-unchanged` `--no-tags` |
-| [info/](info/) | `excalirender info` | Legend of Zelda | text, JSON | `--json` |
-| [combine/](combine/) | `excalirender combine` | Pokemon | PNG, PDF | `--labels` `--layout` `--gap` |
-| [recursive/](recursive/) | `excalirender -r` | Lord of the Rings | PNG, SVG, PDF | `-r` `-o <dir>` |
+| Example | Command | Theme | Preview |
+|---------|---------|-------|---------|
+| [export/](export/) | `excalirender` | Super Mario Bros | ![](export/mario-level.png) |
+| [diff-gif/](diff-gif/) | `excalirender diff` | Hollow Knight | ![](diff-gif/diff.gif) |
+| [info/](info/) | `excalirender info` | Legend of Zelda | ![](info/zelda-inventory.png) |
+| [combine/](combine/) | `excalirender combine` | Pokemon | ![](combine/team-red.png) |
+| [recursive/](recursive/) | `excalirender -r` | Lord of the Rings | ![](recursive/shire/hobbiton.png) |
 
 ## Quick Start
 
