@@ -46,6 +46,8 @@ function parseDiffArgs(): DiffCLIArgs {
       "Output file path (.png, .svg, or .excalidraw)",
     )
     .option("-s, --scale <number>", "Export scale factor", "1")
+    .option("-d, --dark", "Enable dark mode export", false)
+    .option("--transparent", "Transparent background (no fill)", false)
     .option("--hide-unchanged", "Don't render unchanged elements", false)
     .option("--no-tags", "Don't render status tags below elements")
     .parse(process.argv.slice(1)); // Skip 'diff' from argv
@@ -70,6 +72,8 @@ function parseDiffArgs(): DiffCLIArgs {
       scale: parseFloat(opts.scale) || 1,
       hideUnchanged: opts.hideUnchanged || false,
       showTags: opts.tags !== false, // --no-tags sets opts.tags to false
+      darkMode: opts.dark || false,
+      transparent: opts.transparent || false,
     },
   };
 }
@@ -94,6 +98,7 @@ function parseExportArgs(): ExportCLIArgs {
     .option("-s, --scale <number>", "Export scale factor", "1")
     .option("-b, --background <color>", "Background color (e.g., #ffffff)")
     .option("-d, --dark", "Enable dark mode export", false)
+    .option("--transparent", "Transparent background (no fill)", false)
     .option(
       "-f, --frame <name>",
       "Export only the specified frame (by name or ID)",
@@ -132,7 +137,7 @@ function parseExportArgs(): ExportCLIArgs {
     options: {
       outputPath,
       scale: parseFloat(opts.scale) || 1,
-      background: opts.background || null,
+      background: opts.transparent ? "transparent" : opts.background || null,
       darkMode: opts.dark || false,
       frameId: opts.frame || undefined,
     },
@@ -159,6 +164,7 @@ Options:
   -s, --scale <number>        Export scale factor (default: "1")
   -b, --background <color>    Background color (e.g., #ffffff)
   -d, --dark                  Enable dark mode export (default: false)
+  --transparent               Transparent background (no fill) (default: false)
   -f, --frame <name>          Export only the specified frame (by name or ID)
   -h, --help                  display help for command
 

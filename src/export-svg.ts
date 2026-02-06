@@ -570,7 +570,9 @@ export async function exportToSvg(
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${viewW} ${viewH}">\n`;
 
   // Background
-  svg += `<rect x="0" y="0" width="${viewW}" height="${viewH}" fill="${backgroundColor}"/>\n`;
+  if (backgroundColor !== "transparent") {
+    svg += `<rect x="0" y="0" width="${viewW}" height="${viewH}" fill="${backgroundColor}"/>\n`;
+  }
 
   // Collect used font families from text elements for @font-face embedding
   const usedFontFamilyIds = new Set<number>();
@@ -766,7 +768,9 @@ export async function exportToSvgWithElements(
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${options.width}" height="${options.height}" viewBox="0 0 ${viewW} ${viewH}">\n`;
 
   // Background
-  svg += `<rect x="0" y="0" width="${viewW}" height="${viewH}" fill="${options.backgroundColor}"/>\n`;
+  if (options.backgroundColor !== "transparent") {
+    svg += `<rect x="0" y="0" width="${viewW}" height="${viewH}" fill="${options.backgroundColor}"/>\n`;
+  }
 
   // Collect used font families from text elements
   const usedFontFamilyIds = new Set<number>();

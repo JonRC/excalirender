@@ -47,6 +47,7 @@ excalirender <input> [options]
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-b, --background <color>` | Background color (hex) | From file or `#ffffff` |
 | `-d, --dark` | Enable dark mode export | `false` |
+| `--transparent` | Transparent background (no fill) | `false` |
 
 ### Examples
 
@@ -55,6 +56,7 @@ excalirender drawing.excalidraw -o output.png      # Custom output path
 excalirender drawing.excalidraw -s 2               # 2x resolution
 excalirender drawing.excalidraw --dark             # Dark mode
 excalirender drawing.excalidraw -b "#f0f0f0"       # Custom background
+excalirender drawing.excalidraw --transparent       # Transparent background
 excalirender drawing.excalidraw -o out.svg         # SVG output
 ```
 
@@ -82,6 +84,8 @@ excalirender diff old.excalidraw new.excalidraw
 |------|-------------|---------|
 | `-o, --output <path>` | Output file (.png, .svg, or .excalidraw) | `<old>_vs_<new>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
+| `-d, --dark` | Enable dark mode export | `false` |
+| `--transparent` | Transparent background (no fill) | `false` |
 | `--hide-unchanged` | Don't render unchanged elements | `false` |
 | `--no-tags` | Don't render status tags | `false` |
 
@@ -90,6 +94,8 @@ Examples:
 ```bash
 excalirender diff v1.excalidraw v2.excalidraw                # Creates v1_vs_v2.png
 excalirender diff old.excalidraw new.excalidraw -o diff.svg  # SVG output
+excalirender diff old.excalidraw new.excalidraw --dark       # Dark mode
+excalirender diff old.excalidraw new.excalidraw --transparent    # Transparent background
 excalirender diff old.excalidraw new.excalidraw --hide-unchanged
 ```
 

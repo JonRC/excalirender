@@ -25,6 +25,8 @@ export interface DiffOptions {
   scale: number;
   hideUnchanged: boolean;
   showTags: boolean;
+  darkMode: boolean;
+  transparent: boolean;
 }
 
 /**

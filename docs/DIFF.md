@@ -35,6 +35,12 @@ excalirender diff old.excalidraw new.excalidraw --hide-unchanged
 
 # Disable status tags
 excalirender diff old.excalidraw new.excalidraw --no-tags
+
+# Dark mode
+excalirender diff old.excalidraw new.excalidraw --dark
+
+# Transparent background
+excalirender diff old.excalidraw new.excalidraw --transparent
 ```
 
 ### Output Naming
@@ -163,6 +169,8 @@ interface DiffOptions {
   scale: number;
   hideUnchanged: boolean;
   showTags: boolean;
+  darkMode: boolean;
+  transparent: boolean;
 }
 ```
 
@@ -172,5 +180,7 @@ interface DiffOptions {
 |--------|-------------|---------|
 | `-o, --output <path>` | Output file path (.png, .svg, or .excalidraw) | `<old>_vs_<new>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
+| `-d, --dark` | Enable dark mode export | `false` |
+| `--transparent` | Transparent background (no fill) | `false` |
 | `--hide-unchanged` | Don't render unchanged elements | `false` |
 | `--no-tags` | Don't render status tags | `false` |
