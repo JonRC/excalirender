@@ -146,6 +146,33 @@ cat diagram.excalidraw | excalirender info -       # Read from stdin
 |------|-------------|---------|
 | `--json` | Output metadata as JSON | `false` |
 
+### Watch Command
+
+Watch `.excalidraw` file(s) and preview in the browser with live reload. The number of input files determines the mode: 1 file for export, 2 files for diff.
+
+```bash
+excalirender watch diagram.excalidraw                              # Export mode
+excalirender watch old.excalidraw new.excalidraw                   # Diff mode
+excalirender watch diagram.excalidraw --dark --scale 2 --port 8080 # With options
+excalirender watch old.excalidraw new.excalidraw --hide-unchanged  # Diff options
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-p, --port <number>` | HTTP server port | `3333` |
+| `-s, --scale <number>` | Export scale factor | `1` |
+| `-d, --dark` | Enable dark mode | `false` |
+| `--transparent` | Transparent background | `false` |
+| `-b, --background <color>` | Background color | From file |
+| `-f, --frame <name>` | Export specific frame (export mode only) | - |
+| `--no-open` | Don't auto-open browser | `false` |
+| `--hide-unchanged` | Don't render unchanged elements (diff mode) | `false` |
+| `--no-tags` | Don't render status tags (diff mode) | - |
+
+Editing and saving the `.excalidraw` file auto-refreshes the browser preview. Parse errors are logged without crashing — the last good render is preserved. Press Ctrl+C to stop the server.
+
+See [docs/WATCH.md](docs/WATCH.md) for architecture and implementation details.
+
 ## How It Works
 
 The rendering pipeline reads `.excalidraw` JSON files and draws elements to a server-side canvas using the same libraries Excalidraw uses:
