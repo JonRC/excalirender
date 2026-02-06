@@ -43,7 +43,7 @@ function parseDiffArgs(): DiffCLIArgs {
     .argument("<new>", "Path to the new/modified .excalidraw file")
     .option(
       "-o, --output <path>",
-      "Output file path (.png, .svg, or .excalidraw)",
+      "Output file path (.png, .svg, .pdf, or .excalidraw)",
     )
     .option("-s, --scale <number>", "Export scale factor", "1")
     .option("-d, --dark", "Enable dark mode export", false)
@@ -83,7 +83,7 @@ function parseExportArgs(): ExportCLIArgs {
 
   program
     .name("excalirender")
-    .description("Convert .excalidraw files to PNG or SVG")
+    .description("Convert .excalidraw files to PNG, SVG, or PDF")
     .version(packageJson.version)
     .argument("<input>", "Input .excalidraw file or directory (with -r)")
     .option(
@@ -148,7 +148,7 @@ function showHelp(): void {
   console.log(`Usage: excalirender [options] <input>
        excalirender diff [options] <old> <new>
 
-Convert .excalidraw files to PNG or SVG
+Convert .excalidraw files to PNG, SVG, or PDF
 
 Commands:
   diff <old> <new>            Create a visual diff between two .excalidraw files

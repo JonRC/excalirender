@@ -110,6 +110,7 @@ export async function exportDiffToPng(
   oldPath: string,
   newPath: string,
   options: DiffOptions,
+  format: "png" | "pdf" = "png",
 ): Promise<void> {
   const diff = computeDiff(oldPath, newPath);
 
@@ -176,6 +177,7 @@ export async function exportDiffToPng(
     ct,
     darkMode: options.darkMode,
     files: {},
+    format,
     afterRender: options.showTags
       ? (ctx, offsetX, offsetY) => {
           for (const { element, status } of taggedElements) {
