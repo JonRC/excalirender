@@ -131,19 +131,7 @@ See [docs/DIFF.md](docs/DIFF.md) for algorithm details and visual output documen
 
 ### Info Command
 
-Display metadata about an `.excalidraw` file without rendering it:
-
-```bash
-excalirender info diagram.excalidraw
-```
-
-| Flag | Description | Default |
-|------|-------------|---------|
-| `--json` | Output metadata as JSON | `false` |
-
-Shows element count by type, canvas dimensions, fonts used, color palette, frames, and embedded files.
-
-Examples:
+Display metadata about an `.excalidraw` file without rendering. Shows element counts by type, canvas dimensions, fonts, color palette, frames, and embedded files.
 
 ```bash
 excalirender info diagram.excalidraw              # Human-readable output
@@ -151,34 +139,9 @@ excalirender info diagram.excalidraw --json        # JSON output
 cat diagram.excalidraw | excalirender info -       # Read from stdin
 ```
 
-Sample output:
-
-```
-File: diagram.excalidraw
-Size: 3.9 KB
-Version: 2
-Source: https://excalidraw.com
-
-Elements: 8
-  rectangle: 3
-  frame: 2
-  ellipse: 1
-  text: 1
-  diamond: 1
-
-Canvas: 570 x 371 px
-Background: #ffffff
-
-Fonts:
-  Excalifont
-
-Colors:
-  Stroke: #1971c2, #1e1e1e, #2f9e44
-  Fill: #a5d8ff, #b2f2bb, #ffc9c9
-
-Frames:
-  My Frame, frame-2
-```
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--json` | Output metadata as JSON | `false` |
 
 ## How It Works
 
