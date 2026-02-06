@@ -2,6 +2,8 @@
 
 A visual diff example using a Hollow Knight game completion flowchart. Two versions of the same diagram — one with mistakes, one correct — demonstrate all three diff types: **Added**, **Removed**, and **Modified**.
 
+![Diff Animation](diff.gif)
+
 ## Files
 
 - `old.excalidraw` — incorrect flow with typos, a wrong area name, and a fake location
