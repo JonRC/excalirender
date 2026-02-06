@@ -12,6 +12,9 @@
 # Stage 1: Build the binary on Debian Bullseye (glibc 2.31)
 FROM debian:bullseye-slim AS builder
 
+# Configure apt-get to retry on transient network errors
+RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries
+
 # Install Bun
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl unzip ca-certificates \
@@ -35,6 +38,9 @@ RUN bun run build
 
 # Stage 2: Collect binary + all shared library dependencies into a tarball
 FROM debian:bullseye-slim AS packager
+
+# Configure apt-get to retry on transient network errors
+RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries
 
 # Install runtime libs so ldd can resolve all .so deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
