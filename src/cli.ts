@@ -99,6 +99,7 @@ function buildDiffArgs(
       showTags: opts.tags !== false,
       darkMode: (opts.dark as boolean) || false,
       transparent: (opts.transparent as boolean) || false,
+      gifDelay: Number.parseInt(opts.delay as string, 10) || 1000,
     },
   };
 }
@@ -157,13 +158,14 @@ export function parseArgs(): CLIArgs {
     .argument("<new>", "Path to the new/modified .excalidraw file")
     .option(
       "-o, --output <path>",
-      "Output file path (.png, .svg, .pdf, or .excalidraw)",
+      "Output file path (.png, .svg, .pdf, .gif, or .excalidraw)",
     )
     .option("-s, --scale <number>", "Export scale factor", "1")
     .option("-d, --dark", "Enable dark mode export", false)
     .option("--transparent", "Transparent background (no fill)", false)
     .option("--hide-unchanged", "Don't render unchanged elements", false)
     .option("--no-tags", "Don't render status tags below elements")
+    .option("--delay <ms>", "GIF frame delay in milliseconds", "1000")
     .option(
       "--format <type>",
       "Output format when using stdout (-o -): png, svg",

@@ -108,12 +108,13 @@ excalirender diff old.excalidraw new.excalidraw
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `-o, --output <path>` | Output file (.png, .svg, .pdf, or .excalidraw) | `<old>_vs_<new>.png` |
+| `-o, --output <path>` | Output file (.png, .svg, .pdf, .gif, or .excalidraw) | `<old>_vs_<new>.png` |
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-d, --dark` | Enable dark mode export | `false` |
 | `--transparent` | Transparent background (no fill) | `false` |
 | `--hide-unchanged` | Don't render unchanged elements | `false` |
 | `--no-tags` | Don't render status tags | `false` |
+| `--delay <ms>` | GIF frame delay in milliseconds | `1000` |
 | `--format <type>` | Output format when using stdout (`-o -`): `png`, `svg` | `png` |
 
 Examples:
@@ -125,6 +126,8 @@ excalirender diff old.excalidraw new.excalidraw -o diff.pdf  # PDF output
 excalirender diff old.excalidraw new.excalidraw --dark       # Dark mode
 excalirender diff old.excalidraw new.excalidraw --transparent    # Transparent background
 excalirender diff old.excalidraw new.excalidraw --hide-unchanged
+excalirender diff old.excalidraw new.excalidraw -o diff.gif          # Animated GIF
+excalirender diff old.excalidraw new.excalidraw -o diff.gif --delay 2000  # 2s delay
 ```
 
 See [docs/DIFF.md](docs/DIFF.md) for algorithm details and visual output documentation.

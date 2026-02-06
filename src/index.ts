@@ -5,6 +5,7 @@ import { basename, dirname, join, relative } from "node:path";
 import { parseArgs } from "./cli.js";
 import {
   exportDiffToExcalidraw,
+  exportDiffToGif,
   exportDiffToPng,
   exportDiffToSvg,
 } from "./diff.js";
@@ -164,14 +165,24 @@ async function main() {
           ? format || "png"
           : options.outputPath.endsWith(".excalidraw")
             ? "excalidraw"
-            : options.outputPath.endsWith(".svg")
-              ? "svg"
-              : options.outputPath.endsWith(".pdf")
-                ? "pdf"
-                : "png";
+            : options.outputPath.endsWith(".gif")
+              ? "gif"
+              : options.outputPath.endsWith(".svg")
+                ? "svg"
+                : options.outputPath.endsWith(".pdf")
+                  ? "pdf"
+                  : "png";
 
       if (outputFormat === "excalidraw") {
         await exportDiffToExcalidraw(
+          oldPath,
+          newPath,
+          options,
+          oldContent,
+          newContent,
+        );
+      } else if (outputFormat === "gif") {
+        await exportDiffToGif(
           oldPath,
           newPath,
           options,

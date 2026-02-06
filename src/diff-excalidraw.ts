@@ -27,6 +27,7 @@ export interface DiffOptions {
   showTags: boolean;
   darkMode: boolean;
   transparent: boolean;
+  gifDelay?: number;
 }
 
 /**

@@ -1,5 +1,6 @@
 import { createWriteStream, writeFileSync } from "node:fs";
 import {
+  type Canvas,
   type CanvasRenderingContext2D,
   createCanvas,
   type Image,
@@ -885,10 +886,9 @@ export async function exportToPng(
 }
 
 /**
- * Options for rendering pre-styled elements to PNG.
+ * Options for rendering pre-styled elements to a canvas.
  */
-export interface RenderOptions {
-  outputPath: string;
+export interface RenderToCanvasOptions {
   scale: number;
   bounds: Bounds;
   width: number;
@@ -897,7 +897,6 @@ export interface RenderOptions {
   ct: ColorTransform;
   darkMode: boolean;
   files: Record<string, { dataURL: string }>;
-  format?: "png" | "pdf";
   /** Optional callback to render additional content after elements (e.g., diff tags) */
   afterRender?: (
     ctx: CanvasRenderingContext2D,
@@ -907,29 +906,26 @@ export interface RenderOptions {
 }
 
 /**
- * Export pre-styled elements to PNG.
- * Used by diff export to render elements with custom styling.
+ * Options for exporting pre-styled elements to PNG/PDF file.
  */
-export async function exportToPngWithElements(
+export interface RenderOptions extends RenderToCanvasOptions {
+  outputPath: string;
+  format?: "png" | "pdf";
+}
+
+/**
+ * Render pre-styled elements to a canvas and return it.
+ * Used by diff GIF export to get pixel data, and by exportToPngWithElements for file output.
+ */
+export async function renderElementsToCanvas(
   elements: ExcalidrawElement[],
-  options: RenderOptions,
-): Promise<void> {
+  options: RenderToCanvasOptions,
+): Promise<Canvas> {
   // Register fonts first
   registerFonts();
 
-  const format = options.format || "png";
-
-  // Create canvas (PDF backend for pdf format)
-  const canvas =
-    format === "pdf"
-      ? createCanvas(options.width, options.height, "pdf")
-      : createCanvas(options.width, options.height);
+  const canvas = createCanvas(options.width, options.height);
   const ctx = canvas.getContext("2d");
-
-  // Enable font embedding for selectable text in PDF
-  if (format === "pdf") {
-    (ctx as any).textDrawingMode = "glyph";
-  }
 
   // Apply scale
   ctx.scale(options.scale, options.scale);
@@ -991,15 +987,87 @@ export async function exportToPngWithElements(
     options.afterRender(ctx, offsetX, offsetY);
   }
 
-  // Write output
+  return canvas;
+}
+
+/**
+ * Export pre-styled elements to PNG or PDF.
+ * Used by diff export to render elements with custom styling.
+ */
+export async function exportToPngWithElements(
+  elements: ExcalidrawElement[],
+  options: RenderOptions,
+): Promise<void> {
+  const format = options.format || "png";
+
   if (format === "pdf") {
+    // PDF requires special canvas backend
+    registerFonts();
+
+    const pdfCanvas = createCanvas(options.width, options.height, "pdf");
+    const ctx = pdfCanvas.getContext("2d");
+    (ctx as any).textDrawingMode = "glyph";
+
+    ctx.scale(options.scale, options.scale);
+
+    if (options.backgroundColor !== "transparent") {
+      ctx.fillStyle = options.backgroundColor;
+      ctx.fillRect(
+        0,
+        0,
+        options.width / options.scale,
+        options.height / options.scale,
+      );
+    }
+
+    const rc = (rough as any).canvas(pdfCanvas) as RoughCanvas;
+    const offsetX = -options.bounds.minX;
+    const offsetY = -options.bounds.minY;
+
+    const imageCache = new Map<string, Image>();
+    for (const [fileId, fileData] of Object.entries(options.files)) {
+      try {
+        const img = await loadImage(fileData.dataURL);
+        imageCache.set(fileId, img);
+      } catch (err) {
+        console.warn(`Failed to load image ${fileId}:`, err);
+      }
+    }
+
+    const elementsById = new Map<string, ExcalidrawElement>();
+    for (const element of elements) {
+      elementsById.set(element.id, element);
+    }
+
+    for (const element of elements) {
+      renderElement(
+        rc,
+        ctx,
+        element,
+        offsetX,
+        offsetY,
+        options.ct,
+        imageCache,
+        options.darkMode,
+        options.backgroundColor,
+        elementsById,
+      );
+    }
+
+    if (options.afterRender) {
+      options.afterRender(ctx, offsetX, offsetY);
+    }
+
     if (options.outputPath === "-") {
-      process.stdout.write(canvas.toBuffer("application/pdf"));
+      process.stdout.write(pdfCanvas.toBuffer("application/pdf"));
     } else {
-      writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+      writeFileSync(options.outputPath, pdfCanvas.toBuffer("application/pdf"));
     }
     return;
   }
+
+  // PNG path: render to canvas then write file
+  const canvas = await renderElementsToCanvas(elements, options);
 
   if (options.outputPath === "-") {
     // Write PNG to stdout

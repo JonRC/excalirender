@@ -33,6 +33,7 @@
     "commander": "^14.0.2",
     "perfect-freehand": "^1.2.0",
     "points-on-curve": "^1.0.1",
+    "gifenc": "^1.0.3",
     "roughjs": "^4.6.6"
   },
   "devDependencies": {

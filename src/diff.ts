@@ -28,6 +28,9 @@ export {
   exportDiffToExcalidraw,
 } from "./diff-excalidraw.js";
 
+// Re-export from diff-gif
+export { exportDiffToGif } from "./diff-gif.js";
+
 /** Element with its diff status for tag rendering */
 interface TaggedElement {
   element: ExcalidrawElement;
