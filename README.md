@@ -146,6 +146,30 @@ cat diagram.excalidraw | excalirender info -       # Read from stdin
 |------|-------------|---------|
 | `--json` | Output metadata as JSON | `false` |
 
+### Combine Command
+
+Combine multiple `.excalidraw` files into a single image, placed side by side or stacked vertically:
+
+```bash
+excalirender combine a.excalidraw b.excalidraw                    # Side by side (combined.png)
+excalirender combine a.excalidraw b.excalidraw -o out.png         # Custom output
+excalirender combine a.excalidraw b.excalidraw --layout vertical  # Stacked vertically
+excalirender combine a.excalidraw b.excalidraw --labels           # Show filenames below each panel
+excalirender combine a.excalidraw b.excalidraw --dark --gap 60    # Dark mode, 60px gap
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o, --output <path>` | Output file path (.png or .pdf) | `combined.png` |
+| `-l, --layout <type>` | Layout: `horizontal` or `vertical` | `horizontal` |
+| `--gap <pixels>` | Gap between panels in pixels | `40` |
+| `--labels` | Show filename labels below each panel | `false` |
+| `-s, --scale <number>` | Export scale factor | `1` |
+| `-d, --dark` | Enable dark mode export | `false` |
+| `--transparent` | Transparent background (no fill) | `false` |
+
+See [docs/COMBINE.md](docs/COMBINE.md) for implementation details.
+
 ## How It Works
 
 The rendering pipeline reads `.excalidraw` JSON files and draws elements to a server-side canvas using the same libraries Excalidraw uses:
