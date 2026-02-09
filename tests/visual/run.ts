@@ -41,7 +41,7 @@ const MAX_DIFF_PERCENT = 1.0;
 const MAX_SVG_DIFF_PERCENT = 5.0;
 
 type TestFormat = "png" | "svg";
-type TestType = "export" | "diff";
+type TestType = "export" | "diff" | "combine";
 
 interface TestCase {
   name: string;
@@ -53,6 +53,10 @@ interface TestCase {
   format: TestFormat;
   type: TestType;
   diffNewFixture?: string; // For diff tests: the "new" file
+  combineFixtures?: string[]; // For combine tests: array of fixture paths
+  layout?: "horizontal" | "vertical";
+  labels?: boolean;
+  gap?: number;
 }
 
 function discoverTests(): TestCase[] {
@@ -214,6 +218,62 @@ function discoverTests(): TestCase[] {
     });
   }
 
+  // Add combine tests
+  const combineFixtureA = join(FIXTURES_DIR, "basic-shapes.excalidraw");
+  const combineFixtureB = join(FIXTURES_DIR, "arrows-lines.excalidraw");
+  if (existsSync(combineFixtureA) && existsSync(combineFixtureB)) {
+    tests.push({
+      name: "combine-horizontal",
+      fixture: combineFixtureA,
+      combineFixtures: [combineFixtureA, combineFixtureB],
+      outputName: "combine-horizontal.png",
+      baselineName: "combine-horizontal.png",
+      darkMode: false,
+      scale: 1,
+      format: "png",
+      type: "combine",
+    });
+
+    tests.push({
+      name: "combine-vertical",
+      fixture: combineFixtureA,
+      combineFixtures: [combineFixtureA, combineFixtureB],
+      outputName: "combine-vertical.png",
+      baselineName: "combine-vertical.png",
+      darkMode: false,
+      scale: 1,
+      format: "png",
+      type: "combine",
+      layout: "vertical",
+    });
+
+    tests.push({
+      name: "combine-labels",
+      fixture: combineFixtureA,
+      combineFixtures: [combineFixtureA, combineFixtureB],
+      outputName: "combine-labels.png",
+      baselineName: "combine-labels.png",
+      darkMode: false,
+      scale: 1,
+      format: "png",
+      type: "combine",
+      labels: true,
+    });
+
+    tests.push({
+      name: "combine-gap0",
+      fixture: combineFixtureA,
+      combineFixtures: [combineFixtureA, combineFixtureB],
+      outputName: "combine-gap0.png",
+      baselineName: "combine-gap0.png",
+      darkMode: false,
+      scale: 1,
+      format: "png",
+      type: "combine",
+      gap: 0,
+    });
+  }
+
   return tests;
 }
 
@@ -299,6 +359,48 @@ async function runDiffCli(
     relOutput,
   ];
   if (options.darkMode) args.push("--dark");
+
+  const proc = Bun.spawn(args, {
+    cwd: PROJECT_ROOT,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+
+  const exitCode = await proc.exited;
+  const stderr = await new Response(proc.stderr).text();
+
+  return { success: exitCode === 0, stderr };
+}
+
+async function runCombineCli(
+  fixtures: string[],
+  outputPath: string,
+  options: {
+    layout?: "horizontal" | "vertical";
+    labels?: boolean;
+    gap?: number;
+  } = {},
+): Promise<{ success: boolean; stderr: string }> {
+  const relOutput = relative(PROJECT_ROOT, outputPath);
+  const relFixtures = fixtures.map((f) => relative(PROJECT_ROOT, f));
+
+  const args = [
+    "docker",
+    "run",
+    "--rm",
+    "-v",
+    `${PROJECT_ROOT}:/data`,
+    "-w",
+    "/data",
+    "excalirender:test",
+    "combine",
+    ...relFixtures,
+    "-o",
+    relOutput,
+  ];
+  if (options.layout) args.push("--layout", options.layout);
+  if (options.labels) args.push("--labels");
+  if (options.gap !== undefined) args.push("--gap", String(options.gap));
 
   const proc = Bun.spawn(args, {
     cwd: PROJECT_ROOT,
@@ -488,7 +590,13 @@ async function main() {
 
     // Generate output via Docker
     let result: { success: boolean; stderr: string };
-    if (test.type === "diff" && test.diffNewFixture) {
+    if (test.type === "combine" && test.combineFixtures) {
+      result = await runCombineCli(test.combineFixtures, outputPath, {
+        layout: test.layout,
+        labels: test.labels,
+        gap: test.gap,
+      });
+    } else if (test.type === "diff" && test.diffNewFixture) {
       result = await runDiffCli(test.fixture, test.diffNewFixture, outputPath, {
         darkMode: test.darkMode,
       });
