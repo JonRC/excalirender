@@ -1,4 +1,4 @@
-import { existsSync, watch } from "node:fs";
+import { existsSync, type FSWatcher, watch } from "node:fs";
 import { basename } from "node:path";
 import type { CanvasRenderingContext2D } from "canvas";
 import { applyUnchangedStyle, computeDiff } from "./diff-core.js";
@@ -29,6 +29,7 @@ interface WatchConfig {
   diffOptions: DiffOptions;
 }
 
+/** Debounce interval for file watcher — handles editor save sequences (temp file → rename). */
 const DEBOUNCE_MS = 200;
 
 function renderDiffTag(
@@ -157,11 +158,20 @@ async function renderDiffToBuffer(
   return canvas.toBuffer("image/png");
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function buildHtmlPage(title: string): string {
+  const safe = escapeHtml(title);
   return `<!DOCTYPE html>
 <html>
 <head>
-  <title>excalirender — ${title}</title>
+  <title>excalirender — ${safe}</title>
   <style>
     body { margin: 0; background: #1a1a1a; display: flex; flex-direction: column;
            align-items: center; justify-content: center; min-height: 100vh;
@@ -175,7 +185,7 @@ function buildHtmlPage(title: string): string {
 </head>
 <body>
   <div class="header">
-    <span class="file">${title}</span>
+    <span class="file">${safe}</span>
     <span class="time"></span>
   </div>
   <img src="/image" />
@@ -297,14 +307,21 @@ export async function startWatchServer(config: WatchConfig): Promise<void> {
   console.log(`Preview at ${serverUrl}`);
   console.log("");
 
-  // Open browser
+  // Open browser (cross-platform)
   if (open) {
     try {
-      const proc = Bun.spawn(["xdg-open", serverUrl], {
+      const openCmd =
+        process.platform === "darwin"
+          ? "open"
+          : process.platform === "win32"
+            ? "cmd"
+            : "xdg-open";
+      const openArgs =
+        process.platform === "win32" ? ["/c", "start", serverUrl] : [serverUrl];
+      const proc = Bun.spawn([openCmd, ...openArgs], {
         stdout: "ignore",
         stderr: "ignore",
       });
-      // Don't await — let it open in background
       proc.unref();
     } catch {
       // Browser open failed — user can manually navigate
@@ -335,17 +352,19 @@ export async function startWatchServer(config: WatchConfig): Promise<void> {
       notifyClients();
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.log(`[${timestamp()}] Error: ${msg} — keeping last render`);
+      console.error(`[${timestamp()}] Error: ${msg} — keeping last render`);
     }
   }
 
+  const watchers: FSWatcher[] = [];
   for (const filePath of inputPaths) {
-    watch(filePath, onFileChange);
+    watchers.push(watch(filePath, onFileChange));
   }
 
   // Keep process alive — Bun.serve already keeps it alive, but handle SIGINT
   process.on("SIGINT", () => {
     console.log("\nStopping watch server...");
+    for (const w of watchers) w.close();
     server.stop();
     process.exit(0);
   });

@@ -177,7 +177,9 @@ function buildWatchArgs(
     command: "watch",
     inputPaths: files,
     mode,
-    port: Number.parseInt(opts.port as string, 10),
+    port: Number.isNaN(Number.parseInt(opts.port as string, 10))
+      ? 3333
+      : Number.parseInt(opts.port as string, 10),
     open: opts.open !== false,
     exportOptions: {
       outputPath: "",
