@@ -146,8 +146,9 @@ function renderArrow(
   offsetY: number,
   ct: ColorTransform,
 ) {
-  // First render the line part
-  renderLine(rc, element, offsetX, offsetY, ct);
+  // Arrow paths should not be filled — strip backgroundColor
+  const arrowElement = { ...element, backgroundColor: "transparent" };
+  renderLine(rc, arrowElement, offsetX, offsetY, ct);
 
   // Then render arrowheads
   const points = element.points as [number, number][];
