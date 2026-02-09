@@ -142,7 +142,9 @@ function buildCombineArgs(
       layout: ((opts.layout as string) || "horizontal") as
         | "horizontal"
         | "vertical",
-      gap: Number.parseInt(opts.gap as string, 10),
+      gap: Number.isNaN(Number.parseInt(opts.gap as string, 10))
+        ? 40
+        : Number.parseInt(opts.gap as string, 10),
       labels: (opts.labels as boolean) || false,
       scale: Number.parseFloat(opts.scale as string) || 1,
       darkMode: (opts.dark as boolean) || false,

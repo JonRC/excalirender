@@ -164,15 +164,21 @@ async function main() {
       const outputPath = options.outputPath === "-" ? "-" : options.outputPath;
       const ext = outputPath === "-" ? format || "png" : outputPath;
       if (ext.endsWith(".svg")) {
-        console.error("Error: SVG output not supported for combine");
+        console.error(
+          "Error: SVG output not supported for combine. Use PNG or PDF.",
+        );
         process.exit(1);
       }
       if (ext.endsWith(".gif")) {
-        console.error("Error: GIF output not supported for combine");
+        console.error(
+          "Error: GIF output not supported for combine. Use PNG or PDF.",
+        );
         process.exit(1);
       }
       if (ext.endsWith(".excalidraw")) {
-        console.error("Error: .excalidraw output not supported for combine");
+        console.error(
+          "Error: .excalidraw output not supported for combine. Use PNG or PDF.",
+        );
         process.exit(1);
       }
 

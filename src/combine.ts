@@ -9,6 +9,9 @@ import { registerFonts } from "./fonts.js";
 import { applyDarkModeFilter, identityColor, prepareExport } from "./shared.js";
 import type { ExportOptions } from "./types.js";
 
+const LABEL_FONT_SIZE = 14;
+const LABEL_PADDING = 4;
+
 export interface CombineOptions {
   outputPath: string;
   layout: "horizontal" | "vertical";
@@ -34,8 +37,8 @@ export async function exportCombined(
 
   const ct = options.darkMode ? applyDarkModeFilter : identityColor;
   const scaledGap = Math.ceil(options.gap * options.scale);
-  const labelFontSize = Math.ceil(14 * options.scale);
-  const labelPadding = Math.ceil(4 * options.scale);
+  const labelFontSize = Math.ceil(LABEL_FONT_SIZE * options.scale);
+  const labelPadding = Math.ceil(LABEL_PADDING * options.scale);
   const labelHeight = options.labels ? labelFontSize + labelPadding : 0;
 
   // Render each file to an individual canvas
