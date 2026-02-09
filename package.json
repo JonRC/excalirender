@@ -23,7 +23,8 @@
     "test:diff": "bun run tests/diff/run.ts",
     "test:stdin-stdout": "bun run tests/stdin-stdout/run.ts",
     "test:info": "bun run tests/info/run.ts",
-    "test:combine": "bun run tests/combine/run.ts"
+    "test:combine": "bun run tests/combine/run.ts",
+    "test:watch": "bun run tests/watch/run.ts"
   },
   "keywords": ["excalidraw", "cli", "png", "export"],
   "author": "",
