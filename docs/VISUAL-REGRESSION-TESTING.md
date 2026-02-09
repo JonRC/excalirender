@@ -107,6 +107,7 @@ The test runner automatically creates a dark mode variant for any fixture named 
 | `rounded-corners` | Proportional and adaptive roundness on rectangles/diamonds |
 | `opacity` | Elements at 100%, 60%, 30% opacity; semi-transparent text |
 | `all-fonts` | All 7 supported font families (Excalifont, Nunito, Lilita One, Comic Shanns, Virgil, Cascadia, Liberation Sans) |
+| `colored-arrows` | Elbow/curved/straight arrows with non-transparent backgroundColor; verifies arrow paths are not filled |
 
 ## Updating Baselines After Rendering Changes
 
