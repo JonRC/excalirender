@@ -1,6 +1,7 @@
 import { basename } from "node:path";
 import { Command } from "commander";
 import packageJson from "../package.json" with { type: "json" };
+import type { CombineOptions } from "./combine.js";
 import type { DiffOptions } from "./diff.js";
 import type { ExportOptions } from "./types.js";
 
@@ -27,7 +28,18 @@ export interface InfoCLIArgs {
   json: boolean;
 }
 
-export type CLIArgs = ExportCLIArgs | DiffCLIArgs | InfoCLIArgs;
+export interface CombineCLIArgs {
+  command: "combine";
+  inputPaths: string[];
+  format: string | undefined;
+  options: CombineOptions;
+}
+
+export type CLIArgs =
+  | ExportCLIArgs
+  | DiffCLIArgs
+  | InfoCLIArgs
+  | CombineCLIArgs;
 
 /**
  * Generate default output filename for diff command.
@@ -115,6 +127,32 @@ function buildInfoArgs(
   };
 }
 
+function buildCombineArgs(
+  files: string[],
+  opts: Record<string, unknown>,
+): CombineCLIArgs {
+  const outputPath = (opts.output as string) || "combined.png";
+
+  return {
+    command: "combine",
+    inputPaths: files,
+    format: (opts.format as string) || undefined,
+    options: {
+      outputPath,
+      layout: ((opts.layout as string) || "horizontal") as
+        | "horizontal"
+        | "vertical",
+      gap: Number.isNaN(Number.parseInt(opts.gap as string, 10))
+        ? 40
+        : Number.parseInt(opts.gap as string, 10),
+      labels: (opts.labels as boolean) || false,
+      scale: Number.parseFloat(opts.scale as string) || 1,
+      darkMode: (opts.dark as boolean) || false,
+      transparent: (opts.transparent as boolean) || false,
+    },
+  };
+}
+
 export function parseArgs(): CLIArgs {
   let result: CLIArgs | null = null;
 
@@ -183,6 +221,32 @@ export function parseArgs(): CLIArgs {
     .option("--json", "Output metadata as JSON", false)
     .action((input: string, opts: Record<string, unknown>) => {
       result = buildInfoArgs(input, opts);
+    });
+
+  program
+    .command("combine")
+    .description(
+      "Combine multiple .excalidraw files into a single image (side by side or stacked)",
+    )
+    .argument("<files...>", "Input .excalidraw files (at least 2)")
+    .option(
+      "-o, --output <path>",
+      "Output file path (.png or .pdf)",
+      "combined.png",
+    )
+    .option(
+      "-l, --layout <type>",
+      "Layout: horizontal or vertical",
+      "horizontal",
+    )
+    .option("--gap <pixels>", "Gap between panels in pixels", "40")
+    .option("--labels", "Show filename labels below each panel", false)
+    .option("-s, --scale <number>", "Export scale factor", "1")
+    .option("-d, --dark", "Enable dark mode export", false)
+    .option("--transparent", "Transparent background (no fill)", false)
+    .option("--format <type>", "Output format when using stdout (-o -): png")
+    .action((files: string[], opts: Record<string, unknown>) => {
+      result = buildCombineArgs(files, opts);
     });
 
   program.parse();

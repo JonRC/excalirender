@@ -3,6 +3,7 @@
 import { readFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 import { parseArgs } from "./cli.js";
+import { exportCombined } from "./combine.js";
 import {
   exportDiffToExcalidraw,
   exportDiffToGif,
@@ -144,6 +145,44 @@ async function main() {
       const { inputPath, json } = args;
       const content = inputPath === "-" ? readStdin() : undefined;
       runInfo(inputPath, { json }, content);
+    } else if (args.command === "combine") {
+      const { inputPaths, format, options } = args;
+
+      // Validate: at least 2 files
+      if (inputPaths.length < 2) {
+        console.error("Error: At least 2 input files required");
+        process.exit(1);
+      }
+
+      // Validate: stdin not supported
+      if (inputPaths.some((p) => p === "-")) {
+        console.error("Error: Stdin (-) not supported for combine");
+        process.exit(1);
+      }
+
+      // Validate: unsupported output formats
+      const outputPath = options.outputPath === "-" ? "-" : options.outputPath;
+      const ext = outputPath === "-" ? format || "png" : outputPath;
+      if (ext.endsWith(".svg")) {
+        console.error(
+          "Error: SVG output not supported for combine. Use PNG or PDF.",
+        );
+        process.exit(1);
+      }
+      if (ext.endsWith(".gif")) {
+        console.error(
+          "Error: GIF output not supported for combine. Use PNG or PDF.",
+        );
+        process.exit(1);
+      }
+      if (ext.endsWith(".excalidraw")) {
+        console.error(
+          "Error: .excalidraw output not supported for combine. Use PNG or PDF.",
+        );
+        process.exit(1);
+      }
+
+      await exportCombined(inputPaths, options);
     } else if (args.command === "diff") {
       const { oldPath, newPath, format, options } = args;
 

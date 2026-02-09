@@ -22,7 +22,8 @@
     "test:unit": "bun run tests/recursive/run.ts --unit-only",
     "test:diff": "bun run tests/diff/run.ts",
     "test:stdin-stdout": "bun run tests/stdin-stdout/run.ts",
-    "test:info": "bun run tests/info/run.ts"
+    "test:info": "bun run tests/info/run.ts",
+    "test:combine": "bun run tests/combine/run.ts"
   },
   "keywords": ["excalidraw", "cli", "png", "export"],
   "author": "",
@@ -42,6 +43,7 @@
     "@types/bun": "^1.3.8",
     "@types/node": "^25.0.10",
     "@types/pngjs": "^6.0.5",
+    "image-size": "^2.0.2",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0",
     "typescript": "^5.9.3",
