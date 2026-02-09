@@ -160,7 +160,9 @@ function svgArrow(
   oy: number,
   ct: ColorTransform,
 ): string {
-  let out = svgLine(gen, element, ox, oy, ct);
+  // Arrow paths should not be filled — strip backgroundColor
+  const arrowElement = { ...element, backgroundColor: "transparent" };
+  let out = svgLine(gen, arrowElement, ox, oy, ct);
 
   const points = element.points as [number, number][];
   if (!points || points.length < 2) return out;
