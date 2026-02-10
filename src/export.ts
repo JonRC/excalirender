@@ -19,6 +19,7 @@ import {
   type ColorTransform,
   FONT_FAMILY,
   FRAME_STYLE,
+  generateElbowArrowShape,
   getCornerRadius,
   getRoughOptions,
   isPathALoop,
@@ -124,6 +125,12 @@ function renderLine(
   const transformedPoints = points.map(
     ([px, py]) => [x + px, y + py] as [number, number],
   );
+
+  if (element.elbowed) {
+    const pathStr = generateElbowArrowShape(transformedPoints, 16);
+    rc.path(pathStr, options);
+    return;
+  }
 
   if (transformedPoints.length === 2) {
     rc.line(
