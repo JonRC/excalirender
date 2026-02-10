@@ -472,7 +472,9 @@ export function prepareExport(
     const indexA = a.index ?? 0;
     const indexB = b.index ?? 0;
     if (typeof indexA === "string" && typeof indexB === "string") {
-      return indexA.localeCompare(indexB);
+      if (indexA < indexB) return -1;
+      if (indexA > indexB) return 1;
+      return 0;
     }
     return 0;
   });
