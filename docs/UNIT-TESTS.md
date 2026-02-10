@@ -25,10 +25,22 @@ tests/
 │   ├── baselines/    # Expected PNG/SVG outputs
 │   ├── output/       # Generated outputs (gitignored)
 │   └── diffs/        # Diff images on failure (gitignored)
-├── native/           # Native binary tests
-│   └── run.ts        # Tests binary on different distros
-└── recursive/        # Recursive feature tests
-    └── run.ts        # Unit tests for scanner + integration tests
+├── diff/             # Diff command tests
+│   └── run.ts        # Tests diff output formats, tags, options
+├── gif/              # GIF diff export tests
+│   └── run.ts        # Validates GIF structure (frames, dimensions, delay, loop)
+├── info/             # Info command tests
+│   └── run.ts        # Tests metadata collection and output formats
+├── combine/          # Combine command tests
+│   └── run.ts        # Tests layout, labels, multi-file composition
+├── watch/            # Watch command tests
+│   └── run.ts        # Tests HTTP server, SSE, file watching
+├── stdin-stdout/     # Piping tests
+│   └── run.ts        # Tests stdin/stdout piping and content passthrough
+├── recursive/        # Recursive feature tests
+│   └── run.ts        # Unit tests for scanner + integration tests
+└── native/           # Native binary tests
+    └── run.ts        # Tests binary on different distros via Docker
 ```
 
 ## When to Write Unit Tests
@@ -145,18 +157,27 @@ Use descriptive test names with the pattern: `<module>: <behavior being tested>`
 ## Running Tests
 
 ```bash
-# Run all visual regression tests
-bun run test:visual
+# Unit and integration tests (no Docker required)
+bun run test:unit           # Recursive scanner unit tests
+bun run test:diff           # Diff command tests
+bun run test:stdin-stdout   # Stdin/stdout piping tests
+bun run test:info           # Info command tests
+bun run test:combine        # Combine command tests
+bun run test:watch          # Watch command tests
+bun run test:gif            # GIF diff export tests
+bun run test:recursive      # Recursive feature tests (unit + integration)
 
-# Update visual regression baselines
-bun run test:visual --update
+# Visual regression tests (requires Docker for baseline generation)
+bun run test:visual            # Compare against baselines
+bun run test:visual --update   # Update baselines
+bun run test:visual --png-only # Only PNG tests
+bun run test:visual --svg-only # Only SVG tests
 
-# Run recursive feature tests (unit + integration)
-bun run test:recursive
-
-# Run native binary tests
-bun run test:native
+# Native binary tests (requires Docker)
+bun run test:native         # Tests binary on clean Ubuntu container
 ```
+
+**Important**: Do not use bare `bun test` — it picks up the `excalidraw/` reference repo. Always use the specific `bun run test:*` scripts.
 
 ## Integration Tests via Docker
 
@@ -218,12 +239,16 @@ async function testScannerFindsFiles() {
 
 ## CI Integration
 
-Tests run automatically on PR via GitHub Actions:
+Tests run automatically on PR via GitHub Actions (`.github/workflows/ci.yml`):
 
-- `typecheck` - TypeScript compilation check
-- `lint` - Biome linter
-- `visual-tests` - Visual regression tests
-- `docker-build` - Docker image builds successfully
-- `native-build` - Native Linux binary builds successfully
+| Job | Depends On | What It Runs |
+|-----|-----------|--------------|
+| `typecheck` | — | `bun run typecheck` |
+| `lint` | — | `bun run lint` |
+| `unit-tests` | — | `test:unit`, `test:diff`, `test:stdin-stdout`, `test:info`, `test:combine`, `test:watch`, `test:gif` |
+| `docker-build` | typecheck, lint, unit-tests | Builds Docker image + smoke test |
+| `visual-tests` | typecheck, lint, unit-tests | `bun run test:visual` (uploads diff artifacts on failure) |
+| `native-build` | typecheck, visual-tests | Builds native tarball, uploads artifact, attaches to release on tags |
+| `docker-publish` | docker-build, visual-tests | Pushes image to Docker Hub (main branch and tags only) |
 
 Add new test scripts to CI by updating `.github/workflows/ci.yml`.

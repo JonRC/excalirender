@@ -2,7 +2,7 @@
 
 This file contains the description for the Docker Hub repository [jonarc06/excalirender](https://hub.docker.com/r/jonarc06/excalirender).
 
-**Short description:** Convert Excalidraw files to PNG/SVG — server-side rendering, no browser needed
+**Short description:** Convert Excalidraw files to PNG/SVG/PDF — server-side rendering, no browser needed
 
 **Full description (copy everything below the line):**
 
@@ -10,7 +10,7 @@ This file contains the description for the Docker Hub repository [jonarc06/excal
 
 # excalirender
 
-CLI tool that converts [Excalidraw](https://excalidraw.com) `.excalidraw` files to **PNG** and **SVG** images. Server-side rendering with no browser required.
+CLI tool that converts [Excalidraw](https://excalidraw.com) `.excalidraw` files to **PNG**, **SVG**, and **PDF**. Server-side rendering with no browser required.
 
 ## Quick Start
 
@@ -28,6 +28,8 @@ This converts `diagram.excalidraw` to `diagram.png` in the current directory.
 | `-s, --scale <number>` | Export scale factor | `1` |
 | `-b, --background <color>` | Background color (hex) | From file or `#ffffff` |
 | `-d, --dark` | Enable dark mode export | `false` |
+| `--transparent` | Transparent background | `false` |
+| `-f, --frame <name>` | Export a specific frame only | — |
 
 ## Examples
 
@@ -47,6 +49,9 @@ docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalid
 # Dark mode
 docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw --dark
 
+# PDF output
+docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw -o output.pdf
+
 # Custom background color
 docker run --rm -v "$(pwd):/data" -w /data jonarc06/excalirender drawing.excalidraw -b "#f0f0f0"
 ```
@@ -61,7 +66,7 @@ Rectangle, Diamond, Ellipse, Line, Arrow (with labels), Freedraw, Text, Image, F
 - **Stroke styles**: solid, dashed, dotted
 - **Fonts**: Excalifont, Nunito, Comic Shanns, Liberation Sans, Lilita One, Virgil, Cascadia — with Cyrillic, Greek, and Latin Extended unicode support
 - **Dark mode**: full color inversion matching Excalidraw behavior
-- **Output formats**: PNG and SVG (with embedded fonts)
+- **Output formats**: PNG, SVG (with embedded fonts), and PDF (vector with selectable text)
 
 ## Native Binary
 

@@ -197,6 +197,28 @@ interface DiffOptions {
 | `--hide-unchanged` | Don't render unchanged elements | `false` |
 | `--no-tags` | Don't render status tags | `false` |
 | `--delay <ms>` | GIF frame delay in milliseconds | `1000` |
+| `--format <type>` | Output format when using stdout (`-o -`): `png`, `svg` | `png` |
+
+## Piping (stdin/stdout)
+
+The diff command supports Unix-style piping for one of the two inputs and for the output.
+
+**stdin input**: Use `-` as one of the input paths to read `.excalidraw` JSON from stdin (only one input can be stdin):
+```bash
+cat old.excalidraw | excalirender diff - new.excalidraw -o diff.png
+cat new.excalidraw | excalirender diff old.excalidraw - -o diff.svg
+```
+
+**stdout output**: Use `-o -` to write the diff image to stdout:
+```bash
+excalirender diff old.excalidraw new.excalidraw -o - > diff.png
+excalirender diff old.excalidraw new.excalidraw -o - --format svg > diff.svg
+```
+
+**Combined**: Pipe stdin and stdout together:
+```bash
+cat new.excalidraw | excalirender diff old.excalidraw - -o - --format svg | other-tool
+```
 
 ## Animated GIF Output
 

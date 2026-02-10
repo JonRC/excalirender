@@ -118,7 +118,7 @@ Parse errors during re-render are caught and logged to the terminal. The last su
 1. **SSE over WebSocket**: One-way server-to-browser push is all that's needed. SSE is simpler and sufficient.
 2. **PNG only**: The preview always renders PNG (not SVG/PDF) for consistent browser display and fast rendering.
 3. **Dynamic import**: `watch.ts` is loaded via `await import("./watch.js")` so non-watch commands don't pay the import cost.
-4. **Browser open**: Uses `Bun.spawn(["xdg-open", url])` with `unref()` so the child process doesn't block the server. Failures are silently ignored.
+4. **Browser open**: Cross-platform via `Bun.spawn()` — uses `open` on macOS, `cmd /c start` on Windows, `xdg-open` on Linux. Child process is `unref()`'d so it doesn't block the server. Failures are silently ignored.
 5. **Mode from file count**: Instead of a `--diff` flag, the mode is auto-detected from the number of arguments (1 = export, 2 = diff).
 
 ## File Structure
