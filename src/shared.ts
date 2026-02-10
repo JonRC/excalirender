@@ -497,6 +497,80 @@ export function prepareExport(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Elbow arrow shape generation
+// ---------------------------------------------------------------------------
+// Ported from excalidraw/packages/element/src/shape.ts
+// Generates SVG path for elbow arrows with straight segments and small rounded corners.
+
+function pointDistance(a: [number, number], b: [number, number]): number {
+  return Math.hypot(a[0] - b[0], a[1] - b[1]);
+}
+
+export function generateElbowArrowShape(
+  points: [number, number][],
+  radius: number,
+): string {
+  const subpoints: [number, number][] = [];
+
+  for (let i = 1; i < points.length - 1; i++) {
+    const prev = points[i - 1];
+    const next = points[i + 1];
+    const point = points[i];
+
+    const prevIsHorizontal =
+      Math.abs(point[1] - prev[1]) < Math.abs(point[0] - prev[0]);
+    const nextIsHorizontal =
+      Math.abs(next[1] - point[1]) < Math.abs(next[0] - point[0]);
+
+    const corner = Math.min(
+      radius,
+      pointDistance(point, next) / 2,
+      pointDistance(point, prev) / 2,
+    );
+
+    // Approach subpoint (coming from prev)
+    if (prevIsHorizontal) {
+      subpoints.push([
+        point[0] + (prev[0] < point[0] ? -corner : corner),
+        point[1],
+      ]);
+    } else {
+      subpoints.push([
+        point[0],
+        point[1] + (prev[1] < point[1] ? -corner : corner),
+      ]);
+    }
+
+    // Corner control point
+    subpoints.push([point[0], point[1]]);
+
+    // Departure subpoint (going to next)
+    if (nextIsHorizontal) {
+      subpoints.push([
+        point[0] + (next[0] < point[0] ? -corner : corner),
+        point[1],
+      ]);
+    } else {
+      subpoints.push([
+        point[0],
+        point[1] + (next[1] < point[1] ? -corner : corner),
+      ]);
+    }
+  }
+
+  const d = [`M ${points[0][0]} ${points[0][1]}`];
+  for (let i = 0; i < subpoints.length; i += 3) {
+    d.push(`L ${subpoints[i][0]} ${subpoints[i][1]}`);
+    d.push(
+      `Q ${subpoints[i + 1][0]} ${subpoints[i + 1][1]}, ${subpoints[i + 2][0]} ${subpoints[i + 2][1]}`,
+    );
+  }
+  d.push(`L ${points[points.length - 1][0]} ${points[points.length - 1][1]}`);
+
+  return d.join(" ");
+}
+
 /** Escape XML special characters for SVG attribute values */
 export function escapeXml(str: string): string {
   return str

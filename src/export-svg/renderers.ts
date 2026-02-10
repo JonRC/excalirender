@@ -8,6 +8,7 @@ import {
   escapeXml,
   FONT_FAMILY,
   FRAME_STYLE,
+  generateElbowArrowShape,
   getCornerRadius,
   getRoughOptions,
   isPathALoop,
@@ -118,6 +119,12 @@ function svgLine(
   const transformed = points.map(
     ([px, py]) => [x + px, y + py] as [number, number],
   );
+
+  if (element.elbowed) {
+    const pathStr = generateElbowArrowShape(transformed, 16);
+    const drawable = gen.path(pathStr, options);
+    return svgPathsToMarkup(gen.toPaths(drawable), options.strokeLineDash);
+  }
 
   const drawable =
     transformed.length === 2
