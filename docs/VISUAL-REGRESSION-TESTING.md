@@ -48,7 +48,7 @@ Defined in `tests/visual/run.ts`:
 
 - **PIXEL_THRESHOLD** (0.1) — Per-pixel color distance tolerance (0 = exact, 1 = any)
 - **MAX_DIFF_PERCENT** (1.0%) — Maximum percentage of differing pixels before a PNG test fails
-- **MAX_SVG_DIFF_PERCENT** (1.0%) — Maximum percentage of differing pixels before an SVG test fails
+- **MAX_SVG_DIFF_PERCENT** (5.0%) — Maximum percentage of differing pixels before an SVG test fails
 
 ## Adding a New Test Case
 
@@ -90,7 +90,7 @@ git add tests/visual/baselines/my-feature--svg.png
 
 ## Adding a Dark Mode Variant
 
-The test runner automatically creates a dark mode variant for any fixture named `dark-mode.excalidraw`. The variant is tested with the `--dark` flag and saved as `dark-mode--dark.png` (PNG) and `dark-mode--dark--svg.png` (SVG).
+The test runner automatically creates dark mode variants for fixtures named `dark-mode` and `image-elements`. The variant is tested with the `--dark` flag and saved as `{name}--dark.png` (PNG) and `{name}--dark--svg.png` (SVG).
 
 ## Existing Test Cases
 
@@ -101,14 +101,26 @@ The test runner automatically creates a dark mode variant for any fixture named 
 | `stroke-styles` | Solid, dashed, dotted strokes on various shapes |
 | `fill-styles` | Hachure, cross-hatch, solid, zigzag fills |
 | `arrows-lines` | Arrows (one-way, two-way), curved lines, curved arrows |
-| `dark-mode` | Shapes and text rendered in both normal and dark mode |
+| `arrow-labels` | Arrows with bound text labels |
+| `dark-mode` | Shapes and text rendered in both normal and dark mode (+ dark variant) |
 | `freedraw` | Freehand strokes with pressure and simulated pressure |
+| `freedraw-fill` | Closed freehand paths with background fill |
 | `rotated-elements` | Rotated rectangle, ellipse, text |
 | `rounded-corners` | Proportional and adaptive roundness on rectangles/diamonds |
 | `opacity` | Elements at 100%, 60%, 30% opacity; semi-transparent text |
 | `all-fonts` | All 7 supported font families (Excalifont, Nunito, Lilita One, Comic Shanns, Virgil, Cascadia, Liberation Sans) |
+| `unicode-text` | Unicode characters across Latin Extended, Cyrillic, Greek scripts |
+| `image-elements` | Embedded images with crop, flip, rotation, rounded corners (+ dark variant) |
+| `frames` | Frame borders, labels, child element clipping |
+| `rotated-frame` | Rotated frames with clipped children |
+| `embeddable-elements` | Embeddable and iframe placeholder rendering |
+| `box-with-text` | Shapes with bound/contained text elements |
+| `contained-text` | Text bound inside containers (rect, ellipse) with mixed-case fractional indices |
 | `colored-arrows` | Elbow/curved/straight arrows with non-transparent backgroundColor; verifies arrow paths are not filled |
 | `elbow-arrows` | Elbow arrows (elbowed: true) with L/Z/U shapes rendered as straight segments with rounded corners; includes regular curved arrow for regression |
+| `diff-test` | Diff: basic added/removed/modified detection (diff-base vs diff-modified, + dark variant) |
+| `diff-changed-test` | Diff: modified objects specifically (diff-changed-base vs diff-changed-modified) |
+| `diff-complex-test` | Diff: all diff types — added, removed, modified, unchanged (diff-complex-base vs diff-complex-modified) |
 | `combine-horizontal` | Combine command: horizontal layout of basic-shapes + arrows-lines |
 | `combine-vertical` | Combine command: vertical layout of basic-shapes + arrows-lines |
 | `combine-labels` | Combine command: horizontal layout with --labels flag |

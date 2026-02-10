@@ -62,12 +62,13 @@ src/cli.ts        # CLI help text mentions PDF as supported format
 
 ### Canvas Creation
 
-Both `exportToPng()` (line 730) and `exportToPngWithElements()` (line 898) accept a `format` parameter:
+Both `exportToPng()` and `exportToPngWithElements()` accept a `format` parameter:
 
 ```typescript
 export async function exportToPng(
   inputPath: string,
   options: ExportOptions,
+  content?: string,
   format: "png" | "pdf" = "png",
 ): Promise<void> {
   const canvas =
@@ -90,11 +91,15 @@ With `'glyph'` mode, font subsets are embedded in the PDF and text becomes selec
 
 ### PDF Output
 
-PDF uses synchronous buffer output (simpler than PNG's stream-based approach):
+PDF uses synchronous buffer output (simpler than PNG's stream-based approach). Supports both file and stdout output:
 
 ```typescript
 if (format === "pdf") {
-  writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+  if (options.outputPath === "-") {
+    process.stdout.write(canvas.toBuffer("application/pdf"));
+  } else {
+    writeFileSync(options.outputPath, canvas.toBuffer("application/pdf"));
+  }
   return;
 }
 // PNG continues with stream-based output...
@@ -108,7 +113,7 @@ if (format === "pdf") {
 if (options.outputPath.endsWith(".svg")) {
   await exportToSvg(inputFile, options);
 } else if (options.outputPath.endsWith(".pdf")) {
-  await exportToPng(inputFile, options, "pdf");
+  await exportToPng(inputFile, options, undefined, "pdf");
 } else {
   await exportToPng(inputFile, options);
 }
@@ -118,11 +123,10 @@ The same routing applies to diff export and recursive directory conversion.
 
 ### RenderOptions Interface
 
-The `RenderOptions` interface (used by `exportToPngWithElements()` for diff export) includes an optional `format` field:
+The `RenderOptions` interface (used by `exportToPngWithElements()` for diff export) extends `RenderToCanvasOptions` and adds an optional `format` field:
 
 ```typescript
-export interface RenderOptions {
-  outputPath: string;
+export interface RenderToCanvasOptions {
   scale: number;
   bounds: Bounds;
   width: number;
@@ -131,8 +135,12 @@ export interface RenderOptions {
   ct: ColorTransform;
   darkMode: boolean;
   files: Record<string, { dataURL: string }>;
-  format?: "png" | "pdf";
   afterRender?: (ctx: CanvasRenderingContext2D, offsetX: number, offsetY: number) => void;
+}
+
+export interface RenderOptions extends RenderToCanvasOptions {
+  outputPath: string;
+  format?: "png" | "pdf";
 }
 ```
 

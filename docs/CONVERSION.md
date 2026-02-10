@@ -98,7 +98,7 @@ Same libraries Excalidraw uses for rendering:
 4. **Calculate canvas bounds** — compute bounding box across all elements (accounting for rotation)
 5. **Create node-canvas** — sized to bounds × scale factor, filled with background color
 6. **Render elements** — iterate elements sorted by index, draw each one (child elements of frames are clipped to frame bounds)
-7. **Write PNG** — stream canvas to PNG file
+7. **Write output** — stream canvas to PNG file, SVG document, or PDF (based on output extension)
 
 ## Supported Elements
 

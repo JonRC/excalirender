@@ -90,7 +90,7 @@ CLI input → parseArgs() → runInfo(filePath, options, content?)
 | `collectInfo(data, filePath, fileSize)` | info.ts:35 | Gathers all metadata into `FileInfo` |
 | `formatText(info)` | info.ts:147 | Formats `FileInfo` as human-readable text |
 | `formatSize(bytes)` | info.ts:141 | Formats bytes as B/KB/MB |
-| `buildInfoArgs(input, opts)` | cli.ts:103 | Builds `InfoCLIArgs` from commander options |
+| `buildInfoArgs(input, opts)` | cli.ts:130 | Builds `InfoCLIArgs` from commander options |
 
 ### Dependencies from shared.ts
 
