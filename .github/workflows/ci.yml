@@ -66,6 +66,8 @@ jobs:
 
       - run: bun run test:watch
 
+      - run: bun run test:gif
+
   docker-build:
     runs-on: ubuntu-latest
     needs: [typecheck, lint, unit-tests]

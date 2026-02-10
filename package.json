@@ -24,7 +24,8 @@
     "test:stdin-stdout": "bun run tests/stdin-stdout/run.ts",
     "test:info": "bun run tests/info/run.ts",
     "test:combine": "bun run tests/combine/run.ts",
-    "test:watch": "bun run tests/watch/run.ts"
+    "test:watch": "bun run tests/watch/run.ts",
+    "test:gif": "bun run tests/gif/run.ts"
   },
   "keywords": ["excalidraw", "cli", "png", "export"],
   "author": "",
@@ -45,6 +46,7 @@
     "@types/node": "^25.0.10",
     "@types/pngjs": "^6.0.5",
     "image-size": "^2.0.2",
+    "omggif": "^1.0.10",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0",
     "typescript": "^5.9.3",
